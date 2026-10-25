@@ -63,7 +63,7 @@ prospects/
     site-final/index.html    le site à montrer
 ```
 
-`prospects/` est ignoré par git : il contient des données personnelles (téléphones, avis).
+Les captures d'écran et `prospects/liste.json` (résultats bruts) ne sont pas versionnés.
 
 ## Limites à connaître
 
