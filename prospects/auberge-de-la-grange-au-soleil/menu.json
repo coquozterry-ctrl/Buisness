@@ -1,0 +1,517 @@
+{
+  "source": "Photos de la carte papier fournies le 2026-10-25. Prix en CHF.",
+  "a_verifier": "Pizzas transcrites depuis une photo pivotée et floue : noms et prix à confirmer. Dans la colonne des prix des pâtes, l'alignement est légèrement décalé ; correspondance faite ligne à ligne. Plusieurs pages photographiées pivotées : prix lus ligne à ligne. Deux desserts masqués sur la photo, non repris.",
+  "mentions": [
+    "Toutes nos pâtes sont fraîches et faites maison",
+    "Provenance des viandes : porc, poulet, bœuf (Suisse) ; cheval (Paraguay, Argentine) ; poisson (surgelé)"
+  ],
+  "sections": [
+    {
+      "titre": "Entrées",
+      "plats": [
+        {
+          "nom": "Carpaccio de saumon",
+          "desc": "orange, roquette, tomates cerises, toasts au beurre",
+          "prix": 26
+        },
+        {
+          "nom": "Carpaccio de bœuf",
+          "desc": "roquette et parmesan",
+          "prix": 24
+        },
+        {
+          "nom": "Entrée à l'italienne",
+          "desc": "charcuterie, fromages",
+          "prix": 26
+        },
+        {
+          "nom": "Burrata pugliese",
+          "desc": "jambon cru San Daniele",
+          "prix": 25
+        },
+        {
+          "nom": "Tartare de bœuf à la méditerranéenne",
+          "prix": 34
+        },
+        {
+          "nom": "Gambas panées",
+          "desc": "sauce cocktail, agrumes, frites, légumes",
+          "prix": 26
+        },
+        {
+          "nom": "Tomates mozzarella",
+          "desc": "bufala, roquette",
+          "prix": 20
+        },
+        {
+          "nom": "Moules frites à l'italienne",
+          "prix": 26
+        }
+      ]
+    },
+    {
+      "titre": "Salades",
+      "plats": [
+        {
+          "nom": "Salade verte",
+          "prix": 6
+        },
+        {
+          "nom": "Salade mêlée",
+          "prix": 8
+        },
+        {
+          "nom": "Salade végétarienne",
+          "prix": 14
+        },
+        {
+          "nom": "Salade César",
+          "desc": "poulet, salade, tomates cerises, parmesan",
+          "prix": 20
+        },
+        {
+          "nom": "Salade de poulpe",
+          "desc": "pommes de terre, olives taggiasche",
+          "prix": 26
+        },
+        {
+          "nom": "Salade de gambas à la catalane",
+          "prix": 26
+        },
+        {
+          "nom": "Salade de fruits de mer",
+          "prix": 26
+        }
+      ]
+    },
+    {
+      "titre": "Premiers plats de terre",
+      "plats": [
+        {
+          "nom": "Tagliatelle della Nonna",
+          "prix": 24
+        },
+        {
+          "nom": "Parmigiana à l'aubergine",
+          "prix": 22
+        },
+        {
+          "nom": "Lasagnes à la bolognaise maison",
+          "desc": "viande hachée de bœuf",
+          "prix": 22
+        },
+        {
+          "nom": "Pennés à la Boscaiola",
+          "prix": 25
+        },
+        {
+          "nom": "Orecchiette cime di rapa",
+          "desc": "saucisses des Pouilles",
+          "prix": 26
+        },
+        {
+          "nom": "Orecchiette à la Brasciola",
+          "desc": "sauce tomate, viande de cheval",
+          "prix": 30
+        },
+        {
+          "nom": "Orecchiette gratinées au four et burrata",
+          "desc": "sauce tomate",
+          "prix": 28
+        },
+        {
+          "nom": "Pâtes fraîches à l'aubergine",
+          "desc": "ricotta salée",
+          "prix": 23
+        },
+        {
+          "nom": "Gnocchis à la Sorrentina",
+          "prix": 27
+        }
+      ]
+    },
+    {
+      "titre": "Premiers plats de mer",
+      "plats": [
+        {
+          "nom": "Spaghetti aux fruits de mer",
+          "prix": 30
+        },
+        {
+          "nom": "Tagliatelles au saumon",
+          "desc": "orange, tomate cerise",
+          "prix": 28
+        },
+        {
+          "nom": "Paccheri alle pescato",
+          "desc": "espadon, tomate cerise, olive taggiasche",
+          "prix": 30
+        },
+        {
+          "nom": "Gnocchis au safran et vongole",
+          "prix": 28
+        },
+        {
+          "nom": "Spaghetti moules et mollica croquante",
+          "prix": 30
+        },
+        {
+          "nom": "Spaghetti aux vongole",
+          "prix": 28
+        }
+      ]
+    },
+    {
+      "titre": "Raviolis frais maison",
+      "plats": [
+        {
+          "nom": "Ravioli à la crème de truffe",
+          "prix": 25
+        },
+        {
+          "nom": "Raviolis farcis",
+          "desc": "ricotta, saumon, sauce rosée",
+          "prix": 28
+        },
+        {
+          "nom": "Raviolis au ragoût de cerf",
+          "desc": "ricotta, pecorino",
+          "prix": 28
+        }
+      ]
+    },
+    {
+      "titre": "Risottos maison",
+      "plats": [
+        {
+          "nom": "Risotto aux bolets",
+          "prix": 28
+        },
+        {
+          "nom": "Risotto à la milanaise et osso buco",
+          "prix": 30
+        },
+        {
+          "nom": "Risotto aux fruits de mer",
+          "prix": 28
+        },
+        {
+          "nom": "Risotto aux gambas",
+          "prix": 28
+        },
+        {
+          "nom": "Risotto aux gambas et betterave rouge",
+          "prix": 30
+        }
+      ]
+    },
+    {
+      "titre": "Puccias maison",
+      "plats": [
+        {
+          "nom": "Puccia au bœuf 180 g",
+          "desc": "salade, tomate, sauce cocktail, burrata",
+          "prix": 26
+        },
+        {
+          "nom": "Puccia au saumon grillé",
+          "desc": "courgette, tomate, salade, Philadelphia",
+          "prix": 30
+        },
+        {
+          "nom": "Puccia au poulpe grillé",
+          "desc": "aubergine, roquette, tomates cerises, burrata",
+          "prix": 30
+        }
+      ]
+    },
+    {
+      "titre": "Seconds plats de terre",
+      "plats": [
+        {
+          "nom": "Tagliata de bœuf",
+          "desc": "240 g, tomate cerise, roquette, parmesan, frites, légumes",
+          "prix": 40
+        },
+        {
+          "nom": "Magret de canard",
+          "desc": "sauce miel, balsamique, orange, frites, légumes",
+          "prix": 30
+        },
+        {
+          "nom": "Entrecôte de cheval",
+          "desc": "240 g, frites, légumes",
+          "prix": 34
+        },
+        {
+          "nom": "Entrecôte de bœuf",
+          "desc": "240 g, frites, légumes",
+          "prix": 40
+        },
+        {
+          "nom": "Côtelettes d'agneau",
+          "desc": "bolets, polenta, frites",
+          "prix": 45
+        },
+        {
+          "nom": "Tagliata de sanglier",
+          "desc": "fruits rouges cuits au vin blanc, frites, légumes",
+          "prix": 45
+        },
+        {
+          "nom": "Grillade de viande mixte",
+          "desc": "bœuf, cheval, agneau, canard, merguez et saucisse de bœuf",
+          "prix": 50
+        }
+      ]
+    },
+    {
+      "titre": "Seconds plats de mer",
+      "plats": [
+        {
+          "nom": "Fritto misto",
+          "desc": "calamar, gambas, seiche, légumes, sauce cocktail, frites",
+          "prix": 29
+        },
+        {
+          "nom": "Gambas géantes",
+          "desc": "sauce ail, frites, légumes",
+          "prix": 35
+        },
+        {
+          "nom": "Tranches de saumon grillées",
+          "desc": "sauce verte, frites, légumes",
+          "prix": 30
+        },
+        {
+          "nom": "Filets de pangasius",
+          "desc": "tomate cerise, olive taggiasche, câpres, artichaut, frites, légumes",
+          "prix": 30
+        },
+        {
+          "nom": "Filets de perche et salade mêlée en entrée",
+          "desc": "frites, légumes, sauce tartare",
+          "prix": 35
+        },
+        {
+          "nom": "Espadon à la sauce du chef",
+          "desc": "pomme de terre au four, légumes, sauce ail",
+          "prix": 35
+        },
+        {
+          "nom": "Dorade grillée",
+          "desc": "pomme de terre au four, légumes, sauce persil",
+          "prix": 30
+        },
+        {
+          "nom": "Poulpe snacké",
+          "desc": "purée de pommes de terre",
+          "prix": 35
+        }
+      ]
+    },
+    {
+      "titre": "Sauces pour les viandes",
+      "plats": [
+        {
+          "nom": "Bolets",
+          "prix": 8
+        },
+        {
+          "nom": "Café de Paris",
+          "prix": 6
+        },
+        {
+          "nom": "Poivre vert",
+          "prix": 7
+        },
+        {
+          "nom": "Morilles",
+          "prix": 10
+        }
+      ]
+    },
+    {
+      "titre": "Pizzas classiques",
+      "plats": [
+        {
+          "nom": "Margherita",
+          "desc": "sauce tomate, mozzarella, origan",
+          "prix": 15
+        },
+        {
+          "nom": "Marinara",
+          "desc": "sauce tomate, ail, olive, origan",
+          "prix": 15
+        },
+        {
+          "nom": "Prosciutto",
+          "desc": "sauce tomate, mozzarella, jambon, origan",
+          "prix": 20
+        },
+        {
+          "nom": "Santa Lucia",
+          "desc": "sauce tomate, mozzarella, jambon, champignons, origan",
+          "prix": 21
+        },
+        {
+          "nom": "Hawaï",
+          "desc": "sauce tomate, mozzarella, jambon, ananas, origan",
+          "prix": 21
+        },
+        {
+          "nom": "Quatre Saisons",
+          "desc": "sauce tomate, mozzarella, jambon, champignons, poivron, artichaut, origan",
+          "prix": 23
+        },
+        {
+          "nom": "Capricciosa",
+          "desc": "sauce tomate, mozzarella, jambon, champignons, poivron, artichaut, œuf, origan",
+          "prix": 24
+        },
+        {
+          "nom": "Napolitaine",
+          "desc": "sauce tomate, mozzarella, anchois, câpres, olive, origan",
+          "prix": 22
+        },
+        {
+          "nom": "Thon et oignon",
+          "desc": "sauce tomate, mozzarella, thon, oignon, huile d'olive, origan",
+          "prix": 22
+        },
+        {
+          "nom": "Diavola",
+          "desc": "sauce tomate, mozzarella, salami piquant, origan",
+          "prix": 22
+        },
+        {
+          "nom": "Quatre Fromages",
+          "desc": "sauce tomate, mozzarella, gruyère, gorgonzola, brie, origan",
+          "prix": 23
+        },
+        {
+          "nom": "Végétarienne",
+          "desc": "sauce tomate, mozzarella, légumes de saison, origan",
+          "prix": 22
+        }
+      ]
+    },
+    {
+      "titre": "Pizzas spéciales",
+      "plats": [
+        {
+          "nom": "Miss Italia",
+          "desc": "sauce tomate, mozzarella, tomates cerises, roquette, jambon de Parme, bufala, huile d'olive",
+          "prix": 25
+        },
+        {
+          "nom": "Norvegese",
+          "desc": "sauce tomate, mozzarella, saumon, oignon, câpres, origan",
+          "prix": 26
+        },
+        {
+          "nom": "Tunisienne",
+          "desc": "sauce tomate, mozzarella, poivron, olive, merguez, origan",
+          "prix": 25
+        },
+        {
+          "nom": "Caprese",
+          "desc": "mozzarella, fines tranches de tomate, bufala, huile d'olive, origan",
+          "prix": 23
+        },
+        {
+          "nom": "La Grange au Soleil",
+          "desc": "mozzarella, mortadelle, pistache, burrata, origan",
+          "prix": 25,
+          "signature": true
+        },
+        {
+          "nom": "Du patron",
+          "desc": "sauce tomate, mozzarella, crevettes, ail, persil, origan",
+          "prix": 26
+        },
+        {
+          "nom": "Fruits de mer",
+          "desc": "sauce tomate, mozzarella, gambas, calamar, seiche, moules, poulpe, origan",
+          "prix": 25
+        },
+        {
+          "nom": "La Pugliese",
+          "desc": "mozzarella, cime di rapa, saucisse de porc au fenouil, origan",
+          "prix": 28
+        }
+      ]
+    },
+    {
+      "titre": "Menu enfant",
+      "plats": [
+        {
+          "nom": "Pâtes à la tomate",
+          "prix": 10
+        },
+        {
+          "nom": "Nuggets de poulet, frites maison",
+          "prix": 12
+        },
+        {
+          "nom": "Pizza Topolino",
+          "desc": "sauce tomate, mozzarella, origan",
+          "prix": 11
+        },
+        {
+          "nom": "Pizza Orsetto",
+          "desc": "sauce tomate, mozzarella, jambon, origan",
+          "prix": 11
+        },
+        {
+          "nom": "Pizza Maialino",
+          "desc": "sauce tomate, mozzarella, wienerli, frites",
+          "prix": 12
+        }
+      ]
+    },
+    {
+      "titre": "Desserts",
+      "plats": [
+        {
+          "nom": "Tiramisu",
+          "prix": 9
+        },
+        {
+          "nom": "Crème brûlée",
+          "prix": 9
+        },
+        {
+          "nom": "Crème brûlée à la pistache",
+          "prix": 9
+        },
+        {
+          "nom": "Fondant au chocolat",
+          "prix": 13
+        },
+        {
+          "nom": "Panna cotta",
+          "desc": "fruits rouges",
+          "prix": 9
+        },
+        {
+          "nom": "Tarte du chef",
+          "prix": 9
+        },
+        {
+          "nom": "Mousse au chocolat",
+          "prix": 9
+        },
+        {
+          "nom": "Millefeuille",
+          "prix": 12
+        },
+        {
+          "nom": "Glaces",
+          "desc": "chocolat, vanille, fraise, caramel, café, pistache, stracciatella, sorbet citron, sorbet abricot — prix probablement par boule",
+          "prix": 3.5
+        }
+      ]
+    }
+  ]
+}

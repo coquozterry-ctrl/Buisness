@@ -1,0 +1,50 @@
+{
+  "source": "google-manuel",
+  "slug": "auberge-de-la-grange-au-soleil",
+  "nom": "Auberge de la Grange au Soleil",
+  "adresse": "Rte des Brêches 7, 1893 Collombey-Muraz",
+  "plus_code": "7WHH+CP Collombey-Muraz",
+  "telephone": "+41 24 471 15 12",
+  "site": "pirder.top",
+  "statut_site": "suspect",
+  "remarque_site": "Domaine sans rapport avec le restaurant, extension .top souvent utilisée pour du spam : probablement pas son site (lien piraté ou domaine expiré). À vérifier.",
+  "type": "Restaurant",
+  "enseigne_facade": [
+    "Café",
+    "Restaurant",
+    "Pizzeria"
+  ],
+  "note": 4.5,
+  "nb_avis": 305,
+  "prix": "20–30 CHF par personne",
+  "services": {
+    "sur_place": true,
+    "a_emporter": true,
+    "livraison": false
+  },
+  "accessible_fauteuil": true,
+  "terrasse": "visible sur la photo de façade (parasols, tables extérieures)",
+  "horaires": "Ferme à 22h30 (jour du relevé) — détail complet à compléter",
+  "affluence": "Pic le midi (11h-14h), second pic le soir (19h-21h)",
+  "avis": [],
+  "google_maps": "https://www.google.com/maps/search/?api=1&query=Auberge+de+la+Grange+au+Soleil+Collombey-Muraz",
+  "tripadvisor": {
+    "note": 3.8,
+    "nb_avis": 33,
+    "repartition": {
+      "excellent": 10,
+      "bien": 14,
+      "moyen": 4,
+      "mediocre": 4,
+      "horrible": 1
+    },
+    "sous_notes": {
+      "service": 4.3,
+      "repas": 4.1,
+      "qualite_prix": 4.0,
+      "ambiance": 5.0
+    }
+  },
+  "menu": "Photos du menu reçues mais illisibles (112x112 px) : contenu inconnu. Façade : café, restaurant, pizzeria.",
+  "remarque_avis": "Texte des avis non fourni. Seules les notes sont connues."
+}

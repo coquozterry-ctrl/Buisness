@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="fr-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Auberge de la Grange au Soleil – Restaurant italien et pizzeria à Collombey-Muraz</title>
+<meta name="description" content="Auberge de la Grange au Soleil à Collombey-Muraz : cuisine italienne aux accents des Pouilles, pâtes fraîches faites maison, pizzas, terrasse. Sur place ou à emporter. Réservez au 024 471 15 12.">
+<meta name="theme-color" content="#B4502F">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;1,9..144,600&family=Caveat:wght@600&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Restaurant",
+  "name": "Auberge de la Grange au Soleil",
+  "description": "Café, restaurant et pizzeria : cuisine italienne aux accents des Pouilles, pâtes fraîches faites maison, terrasse. Sur place et à emporter.",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Rte des Brêches 7",
+    "postalCode": "1893",
+    "addressLocality": "Collombey-Muraz",
+    "addressRegion": "VS",
+    "addressCountry": "CH"
+  },
+  "telephone": "+41 24 471 15 12",
+  "priceRange": "20–30 CHF",
+  "currenciesAccepted": "CHF",
+  "servesCuisine": ["Italienne", "Pizza"],
+  "hasMap": "https://www.google.com/maps/search/?api=1&query=Auberge+de+la+Grange+au+Soleil+Collombey-Muraz",
+  "hasMenu": {
+    "@type": "Menu",
+    "name": "La carte",
+    "inLanguage": "fr",
+    "hasMenuSection": [
+      {"@type": "MenuSection", "name": "Entrées et salades"},
+      {"@type": "MenuSection", "name": "Pâtes fraîches maison"},
+      {"@type": "MenuSection", "name": "Raviolis frais maison"},
+      {"@type": "MenuSection", "name": "Risottos maison"},
+      {"@type": "MenuSection", "name": "Puccias maison"},
+      {"@type": "MenuSection", "name": "Pizzas"},
+      {"@type": "MenuSection", "name": "Viandes et poissons"},
+      {"@type": "MenuSection", "name": "Menu enfant"},
+      {"@type": "MenuSection", "name": "Desserts"}
+    ]
+  },
+  "amenityFeature": [
+    {"@type": "LocationFeatureSpecification", "name": "Accessible en fauteuil roulant", "value": true},
+    {"@type": "LocationFeatureSpecification", "name": "Terrasse", "value": true},
+    {"@type": "LocationFeatureSpecification", "name": "À emporter", "value": true},
+    {"@type": "LocationFeatureSpecification", "name": "Livraison", "value": false}
+  ]
+}
+</script>
+
+<style>
+:root{
+  --soleil:#F2B33D;
+  --soleil-clair:#FCE6AE;
+  --terre:#B4502F;        /* terracotta */
+  --terre-fonce:#6E2E17;
+  --olive:#5C6B2E;
+  --olive-clair:#E3E6CC;
+  --creme:#FBF5EA;
+  --creme-2:#F4E9D4;
+  --papier:#FFFDF8;
+  --texte:#2E2A24;
+  --texte-doux:#5A5046;
+  --rayon:14px;
+  --titre:"Fraunces", Georgia, "Times New Roman", serif;
+  --main:"Caveat", "Segoe Print", cursive;
+  --corps:"Nunito Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  margin:0;font-family:var(--corps);font-size:1.0625rem;line-height:1.6;color:var(--texte);
+  background-color:var(--creme);
+  background-image:
+    radial-gradient(rgba(180,80,47,.05) 1px, transparent 1.2px),
+    radial-gradient(rgba(92,107,46,.04) 1px, transparent 1.2px);
+  background-size:22px 22px, 31px 31px;
+  background-position:0 0, 11px 7px;
+  overflow-x:hidden;
+  padding-bottom:76px;
+}
+img,svg{max-width:100%;display:block}
+a{color:var(--terre-fonce)}
+a:focus-visible,summary:focus-visible{outline:3px solid var(--terre-fonce);outline-offset:3px;border-radius:6px}
+h1,h2,h3,h4{font-family:var(--titre);line-height:1.15;color:var(--terre-fonce);margin:0 0 .5em;font-weight:700}
+h2{font-size:clamp(1.8rem,5vw,2.6rem)}
+h3{font-size:1.3rem}
+p{margin:0 0 1em}
+.wrap{width:100%;max-width:1120px;margin:0 auto;padding:0 20px}
+.skip{position:absolute;left:-999px;top:0;background:var(--terre-fonce);color:#fff;padding:10px 14px;z-index:100}
+.skip:focus{left:10px;top:10px}
+.manuscrit{font-family:var(--main);font-weight:600;color:var(--terre);font-size:1.65rem;line-height:1.1;display:block;margin-bottom:.15em}
+
+/* Nappe vichy (texture) */
+.vichy{
+  height:14px;
+  background:
+    repeating-linear-gradient(90deg, rgba(180,80,47,.55) 0 14px, transparent 14px 28px),
+    repeating-linear-gradient(0deg, rgba(180,80,47,.55) 0 7px, rgba(180,80,47,.25) 7px 14px);
+}
+
+/* Badge exemple */
+.a-confirmer{position:relative}
+.badge-ex{
+  display:inline-block;font-family:var(--corps);font-size:.72rem;font-weight:700;letter-spacing:.04em;
+  text-transform:uppercase;background:#fff;color:#8A2D12;border:1.5px dashed #8A2D12;
+  border-radius:999px;padding:1px 9px;vertical-align:middle;margin-left:6px;line-height:1.6;white-space:nowrap
+}
+.bloc-ex{border:2px dashed rgba(138,45,18,.45);border-radius:var(--rayon);padding:14px 16px;background:rgba(255,255,255,.55)}
+.note-ex{font-size:.9rem;color:var(--texte-doux);font-style:italic}
+
+/* Boutons */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:.5em;min-height:52px;
+  padding:.75em 1.4em;border-radius:999px;font-weight:700;font-size:1.05rem;text-decoration:none;
+  border:2px solid transparent;transition:transform .15s ease;
+}
+.btn:hover{transform:translateY(-1px)}
+.btn svg{width:20px;height:20px;flex:none}
+.btn-appel{background:var(--terre);color:#fff;box-shadow:0 6px 0 var(--terre-fonce)}
+.btn-route{background:#fff;color:var(--terre-fonce);border-color:var(--terre)}
+.btn-row{display:flex;flex-wrap:wrap;gap:14px}
+
+/* Haut de page */
+.topbar{background:var(--terre-fonce);color:#FBEFD9;font-size:.92rem}
+.topbar .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 16px;padding-top:8px;padding-bottom:8px}
+.topbar a{color:#FFE7B0;font-weight:700;text-decoration:none}
+.topbar a:hover{text-decoration:underline}
+
+.hero{position:relative;padding:28px 0 44px;overflow:hidden}
+.hero::before{
+  content:"";position:absolute;width:540px;height:540px;right:-190px;top:-210px;border-radius:50%;
+  background:radial-gradient(circle, rgba(242,179,61,.6) 0%, rgba(242,179,61,.2) 45%, transparent 70%);
+  pointer-events:none
+}
+.hero-grid{position:relative;display:grid;gap:28px}
+.logo{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.logo svg{width:52px;height:52px}
+.logo span{font-family:var(--titre);font-weight:700;color:var(--terre);font-size:1rem;line-height:1.2}
+.hero h1{font-size:clamp(1.5rem,4.6vw,2rem);margin-bottom:.2em;color:var(--terre)}
+.promesse{
+  font-family:var(--titre);font-weight:700;font-size:clamp(2.2rem,8.4vw,4.1rem);line-height:1.05;
+  color:var(--terre-fonce);margin:0 0 .35em;letter-spacing:-.01em
+}
+.promesse em{font-style:italic;color:var(--olive)}
+.hero .lead{font-size:1.12rem;color:var(--texte-doux);max-width:34em}
+.note-google{
+  display:inline-flex;align-items:center;gap:10px;background:#fff;border-radius:999px;
+  padding:6px 16px 6px 8px;margin:2px 0 22px;box-shadow:0 2px 0 rgba(110,46,23,.15);font-size:.98rem
+}
+.note-google .etoile{background:var(--soleil);color:var(--terre-fonce);border-radius:999px;padding:2px 10px;font-weight:700}
+.hero .sous-btn{margin-top:14px;font-size:.95rem;color:var(--texte-doux)}
+
+/* Emplacements photo */
+.photo{
+  position:relative;border-radius:var(--rayon);min-height:220px;overflow:hidden;margin:0;
+  display:flex;align-items:flex-end;color:#fff;box-shadow:0 10px 30px -12px rgba(110,46,23,.45)
+}
+.photo figcaption{position:relative;margin:12px;background:rgba(46,42,36,.8);padding:5px 12px;border-radius:8px;font-size:.88rem}
+.photo-facade{
+  min-height:300px;
+  background:
+    linear-gradient(180deg, transparent 45%, rgba(110,46,23,.4) 100%),
+    repeating-linear-gradient(90deg, #E9C88F 0 40px, #E2BD80 40px 42px),
+    #E9C88F;
+}
+.photo-facade::before{
+  content:"";position:absolute;top:22px;right:26px;width:72px;height:72px;border-radius:50%;
+  background:var(--soleil);box-shadow:0 0 0 12px rgba(242,179,61,.3), 0 0 0 26px rgba(242,179,61,.12)
+}
+.photo-facade::after{ /* parasols */
+  content:"";position:absolute;left:8%;bottom:34%;width:84%;height:46px;
+  background:radial-gradient(ellipse 50px 24px at 50px 46px, #B4502F 98%, transparent 100%) 0 0/120px 46px repeat-x;
+  opacity:.85
+}
+.photo-salle{background:linear-gradient(135deg,#6E2E17 0%,#B4502F 55%,#E2A35C 100%)}
+.photo-terrasse{background:linear-gradient(160deg,#FBD983 0%,#F2B33D 45%,#5C6B2E 100%)}
+.photo-pizza{background:radial-gradient(circle at 45% 45%,#FFF1C9 0 10%,#F4D27A 11% 22%,#D9622B 23% 40%,#C9873F 41% 52%,#6E2E17 53%)}
+.photo-pates{background:repeating-radial-gradient(circle at 30% 70%,#F6DE9C 0 6px,#EBC777 6px 12px)}
+.photo-tiramisu{background:linear-gradient(180deg,#5A3A22 0 22%,#F3E3C3 22% 48%,#7B5232 48% 60%,#F3E3C3 60% 86%,#5A3A22 86%)}
+
+/* Bandeau */
+.bandeau{background:var(--olive);color:#fff;padding:16px 0}
+.bandeau ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;justify-content:center;gap:6px 26px;font-weight:700;text-align:center}
+.bandeau li::before{content:"✦ ";color:var(--soleil)}
+
+section{padding:56px 0}
+.intro-sec{max-width:42em;margin-bottom:28px}
+.alt{background:var(--creme-2);border-top:1px solid rgba(180,80,47,.12);border-bottom:1px solid rgba(180,80,47,.12)}
+
+/* Fait maison */
+.maison-grid{display:grid;gap:18px}
+.carte-service{background:var(--papier);border-radius:var(--rayon);padding:22px 20px;border:1px solid rgba(180,80,47,.15)}
+.carte-service .ico{width:54px;height:54px;border-radius:50%;background:var(--soleil-clair);display:grid;place-items:center;margin-bottom:12px;color:var(--terre)}
+.carte-service .ico svg{width:28px;height:28px}
+.carte-service p{color:var(--texte-doux);margin:0}
+.provenance{margin-top:22px;display:flex;gap:12px;align-items:flex-start;background:#fff;border-left:5px solid var(--olive);border-radius:10px;padding:14px 16px}
+.provenance p{margin:0}
+
+/* A goûter */
+.gouter{display:grid;gap:16px}
+.plat-vedette{background:var(--papier);border-radius:var(--rayon);overflow:hidden;border:1px solid rgba(180,80,47,.15);display:flex;flex-direction:column}
+.plat-vedette .photo{border-radius:0;min-height:150px;box-shadow:none}
+.plat-vedette .corps{padding:16px 18px 18px;flex:1;display:flex;flex-direction:column}
+.plat-vedette h3{font-size:1.2rem;margin-bottom:.25em}
+.plat-vedette p{color:var(--texte-doux);font-size:.95rem;margin:0 0 .6em;flex:1}
+.plat-vedette .prix{font-family:var(--titre);font-weight:700;color:var(--terre);font-size:1.25rem}
+.vedette-1{border:2px solid var(--soleil);box-shadow:0 14px 30px -18px rgba(110,46,23,.6)}
+.tag{display:inline-block;align-self:flex-start;background:var(--soleil);color:var(--terre-fonce);font-weight:700;font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:2px 10px;margin-bottom:8px}
+
+/* Carte complète */
+.badge-carte{
+  display:inline-flex;flex-wrap:wrap;align-items:center;gap:4px 8px;background:#fff;color:#8A2D12;border:1.5px dashed #8A2D12;
+  border-radius:12px;padding:8px 14px;font-size:.92rem;margin:0 0 20px;max-width:100%
+}
+.badge-carte strong{text-transform:uppercase;letter-spacing:.05em;font-size:.78rem}
+details.rubrique{background:var(--papier);border:1px solid rgba(180,80,47,.2);border-radius:var(--rayon);margin-bottom:14px;overflow:hidden}
+details.rubrique > summary{
+  list-style:none;cursor:pointer;padding:16px 52px 16px 18px;position:relative;
+  font-family:var(--titre);font-weight:700;font-size:1.3rem;color:var(--terre-fonce)
+}
+details.rubrique > summary::-webkit-details-marker{display:none}
+details.rubrique > summary::after{
+  content:"+";position:absolute;right:16px;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:50%;
+  background:var(--soleil-clair);color:var(--terre-fonce);display:grid;place-items:center;font-family:var(--corps);font-size:1.3rem;line-height:1
+}
+details.rubrique[open] > summary::after{content:"–"}
+details.rubrique > summary small{display:block;font-family:var(--corps);font-weight:400;font-size:.9rem;color:var(--texte-doux)}
+.rubrique-corps{padding:0 18px 18px;display:grid;gap:8px 32px}
+.rubrique-corps h4{font-family:var(--main);font-weight:600;font-size:1.75rem;color:var(--terre);border-bottom:2px solid var(--soleil);padding-bottom:2px;margin:10px 0 6px}
+.mention{font-size:.95rem;color:var(--olive);font-weight:700;margin:6px 0 0}
+ul.plats{list-style:none;margin:0;padding:0}
+ul.plats li{padding:7px 0;border-bottom:1px dotted rgba(180,80,47,.25)}
+ul.plats li:last-child{border-bottom:0}
+.ligne{display:flex;align-items:baseline;gap:8px}
+.ligne .nom{font-weight:700}
+.ligne .pts{flex:1;border-bottom:2px dotted rgba(180,80,47,.4);transform:translateY(-4px);min-width:16px}
+.ligne .px{white-space:nowrap;font-weight:700;color:var(--terre-fonce)}
+ul.plats .d{display:block;font-size:.92rem;color:var(--texte-doux)}
+li.sig{background:var(--soleil-clair);border-radius:8px;padding:8px 10px;margin:4px 0;border-bottom:0}
+li.sig .nom::after{content:" ★ signature";font-weight:700;font-size:.78rem;color:var(--terre-fonce);text-transform:uppercase;letter-spacing:.04em}
+
+/* Horaires */
+.horaires-grid{display:grid;gap:24px}
+.carte-papier{background:var(--papier);border-radius:var(--rayon);padding:22px 20px;box-shadow:0 14px 30px -18px rgba(110,46,23,.5);border:1px solid rgba(180,80,47,.15)}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:10px 4px;border-bottom:1px dotted rgba(180,80,47,.35);vertical-align:top}
+th{font-weight:700;color:var(--terre-fonce);width:42%}
+tr:last-child th,tr:last-child td{border-bottom:0}
+.sur{display:flex;gap:12px;align-items:flex-start;background:#fff;border-left:5px solid var(--olive);border-radius:10px;padding:14px 16px;margin-bottom:14px}
+.affluence{background:var(--soleil-clair);border-radius:10px;padding:14px 16px}
+
+/* Histoire, galerie, avis, accès */
+.histoire-grid{display:grid;gap:26px;align-items:center}
+.phrase{font-family:var(--titre);font-size:1.35rem;color:var(--terre-fonce);border-left:4px solid var(--soleil);padding-left:16px;margin:0 0 18px}
+.galerie{display:grid;gap:14px}
+.notes{display:grid;gap:18px}
+.note-carte{background:var(--papier);border-radius:var(--rayon);padding:22px 20px;text-align:center;border:1px solid rgba(180,80,47,.15)}
+.note-carte .gros{font-family:var(--titre);font-size:3rem;font-weight:700;color:var(--terre);line-height:1}
+.note-carte .src{display:block;margin-top:6px;color:var(--texte-doux);font-size:.95rem}
+.etoiles{color:#9C6508;letter-spacing:2px;font-size:1.2rem}
+.acces-grid{display:grid;gap:24px}
+.infos{list-style:none;margin:0;padding:0}
+.infos li{display:flex;gap:12px;padding:12px 0;border-bottom:1px dotted rgba(180,80,47,.35)}
+.infos li:last-child{border-bottom:0}
+.infos svg{width:22px;height:22px;flex:none;margin-top:3px;color:var(--terre)}
+.carte-plan{
+  min-height:240px;border-radius:var(--rayon);display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;
+  background:
+    linear-gradient(0deg, rgba(251,245,234,.6), rgba(251,245,234,.6)),
+    repeating-linear-gradient(35deg, transparent 0 38px, rgba(92,107,46,.35) 38px 41px),
+    repeating-linear-gradient(-55deg, transparent 0 60px, rgba(180,80,47,.25) 60px 64px),
+    #EADFC6;
+  border:1px solid rgba(180,80,47,.2)
+}
+.carte-plan a{background:#fff;padding:12px 18px;border-radius:999px;font-weight:700;text-decoration:none;box-shadow:0 4px 0 rgba(110,46,23,.25)}
+
+.final{background:var(--terre-fonce);color:#FBEFD9;text-align:center;padding:56px 0;position:relative;overflow:hidden}
+.final::before{content:"";position:absolute;left:50%;top:-140px;transform:translateX(-50%);width:420px;height:280px;border-radius:50%;background:radial-gradient(circle, rgba(242,179,61,.35), transparent 70%)}
+.final h2{color:#FFE7B0;position:relative}
+.final p{position:relative;max-width:34em;margin-left:auto;margin-right:auto}
+.final .btn-row{justify-content:center;position:relative}
+.final .btn-appel{background:var(--soleil);color:var(--terre-fonce);box-shadow:0 6px 0 #B57C14}
+.final .btn-route{background:transparent;color:#FFE7B0;border-color:#FFE7B0}
+.final .tel-gros{font-family:var(--titre);font-size:clamp(1.8rem,7vw,2.6rem);color:#fff;text-decoration:none;display:inline-block;margin:6px 0 18px;position:relative}
+
+footer{background:#2E2A24;color:#E8DCC6;padding:28px 0 24px;font-size:.95rem}
+footer a{color:#FFE7B0}
+footer .wrap{display:grid;gap:10px}
+footer small{color:#BFB29B}
+
+.barre{
+  position:fixed;left:0;right:0;bottom:0;z-index:50;display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;
+  background:var(--papier);border-top:1px solid rgba(180,80,47,.25);box-shadow:0 -6px 18px -8px rgba(46,42,36,.35);
+  padding:8px 8px calc(8px + env(safe-area-inset-bottom));gap:6px
+}
+.barre a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:52px;border-radius:12px;
+  text-decoration:none;font-weight:700;font-size:.8rem;color:var(--terre-fonce);background:var(--creme-2)}
+.barre a svg{width:20px;height:20px}
+.barre a.appel{background:var(--terre);color:#fff;font-size:.92rem}
+
+@media (min-width:700px){
+  .maison-grid{grid-template-columns:repeat(2,1fr)}
+  .gouter{grid-template-columns:repeat(2,1fr)}
+  .notes{grid-template-columns:repeat(3,1fr)}
+  .galerie{grid-template-columns:repeat(2,1fr)}
+  .rubrique-corps{grid-template-columns:1fr 1fr}
+  .rubrique-corps .pleine{grid-column:1/-1}
+}
+@media (min-width:960px){
+  body{padding-bottom:0}
+  .barre{display:none}
+  .hero{padding:44px 0 64px}
+  .hero-grid{grid-template-columns:1.1fr .9fr;align-items:center;gap:48px}
+  .photo-facade{min-height:440px}
+  .maison-grid{grid-template-columns:repeat(4,1fr)}
+  .gouter{grid-template-columns:1.3fr 1fr 1fr 1fr 1fr}
+  .horaires-grid{grid-template-columns:1.1fr .9fr;align-items:start}
+  .histoire-grid{grid-template-columns:.9fr 1.1fr}
+  .galerie{grid-template-columns:2fr 1fr 1fr}
+  .galerie .photo:first-child{grid-row:span 2;min-height:420px}
+  .acces-grid{grid-template-columns:1fr 1fr;align-items:stretch}
+  section{padding:76px 0}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#contenu">Aller au contenu</a>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-tel" viewBox="0 0 24 24"><path fill="currentColor" d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.250.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></symbol>
+  <symbol id="i-horloge" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm.5-13H11v6l5.2 3.1.8-1.2-4.5-2.7z"/></symbol>
+  <symbol id="i-carte" viewBox="0 0 24 24"><path fill="currentColor" d="M5 3h11l3 3v15H5zm2 5v2h10V8zm0 4v2h10v-2zm0 4v2h7v-2z"/></symbol>
+  <symbol id="i-fauteuil" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm7 13h-4.6l-1.1-4H17V9h-4.3l-.5-2H10v6.6l.9 3.4H16l2 4 1.8-.9zM10 20a4 4 0 0 1-1.5-7.7l-.5-2A6 6 0 1 0 15.5 19l-.6-1.7A4 4 0 0 1 10 20z"/></symbol>
+  <symbol id="i-sac" viewBox="0 0 24 24"><path fill="currentColor" d="M7 7V6a5 5 0 0 1 10 0v1h3l-1 14H5L4 7zm2 0h6V6a3 3 0 0 0-6 0z"/></symbol>
+  <symbol id="i-soleil" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3M4.6 4.6l2.1 2.1M17.3 17.3l2.1 2.1M4.6 19.4l2.1-2.1M17.3 6.7l2.1-2.1"/></g></symbol>
+</svg>
+
+<div class="topbar">
+  <div class="wrap">
+    <span>Rte des Brêches 7 · Collombey-Muraz</span>
+    <a href="tel:+41244711512">Réserver : 024 471 15 12</a>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="logo">
+        <svg viewBox="0 0 64 64" role="img" aria-label="Logo : un soleil au-dessus d'une grange">
+          <circle cx="32" cy="22" r="10" fill="#F2B33D"/>
+          <g stroke="#F2B33D" stroke-width="3" stroke-linecap="round"><path d="M32 4v5M17 9l3 4M47 9l-3 4M12 22h5M47 22h5"/></g>
+          <path d="M10 40 32 28l22 12v18H10z" fill="#B4502F"/>
+          <path d="M26 58V46h12v12z" fill="#FBF5EA"/>
+        </svg>
+        <span>Café · Restaurant · Pizzeria</span>
+      </div>
+
+      <h1>Auberge de la Grange au Soleil</h1>
+      <p class="promesse">Toutes nos pâtes sont fraîches et <em>faites maison</em></p>
+      <p class="lead">Une trattoria au soleil à Collombey-Muraz : cuisine italienne aux accents des Pouilles, orecchiette, raviolis, risottos, puccias et vingt pizzas, en salle, en terrasse ou à emporter.</p>
+
+      <p class="note-google"><span class="etoile">4,5 ★</span> <span>sur Google · 305 avis</span></p>
+
+      <div class="btn-row">
+        <a class="btn btn-appel" href="tel:+41244711512"><svg aria-hidden="true"><use href="#i-tel"/></svg>Appeler le 024 471 15 12</a>
+        <a class="btn btn-route" href="https://www.google.com/maps/search/?api=1&amp;query=Auberge+de+la+Grange+au+Soleil+Collombey-Muraz" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-pin"/></svg>Itinéraire</a>
+      </div>
+      <p class="sous-btn">Réservation et commandes à emporter par téléphone · <a href="#carte">Voir la carte</a></p>
+    </div>
+
+    <figure class="photo photo-facade" role="img" aria-label="Emplacement pour une photo de la façade et de la terrasse">
+      <figcaption>Photo de la façade et de la terrasse (à fournir)</figcaption>
+    </figure>
+  </div>
+</header>
+
+<div class="vichy" aria-hidden="true"></div>
+<div class="bandeau" aria-label="En bref">
+  <div class="wrap">
+    <ul>
+      <li>Pâtes fraîches maison</li>
+      <li>Bœuf, porc et poulet suisses</li>
+      <li>Terrasse</li>
+      <li>Sur place &amp; à emporter</li>
+      <li>Accessible en fauteuil roulant</li>
+    </ul>
+  </div>
+</div>
+
+<main id="contenu">
+
+<!-- A GOUTER -->
+<section id="gouter" aria-labelledby="t-gouter">
+  <div class="wrap">
+    <div class="intro-sec">
+      <span class="manuscrit">Pour une première visite</span>
+      <h2 id="t-gouter">À goûter</h2>
+      <p>Cinq plats de la carte pour découvrir la maison.</p>
+    </div>
+    <div class="gouter">
+      <article class="plat-vedette vedette-1">
+        <figure class="photo photo-pizza" role="img" aria-label="Emplacement pour une photo de la pizza La Grange au Soleil"><figcaption>Photo de la pizza (à fournir)</figcaption></figure>
+        <div class="corps">
+          <span class="tag">Notre signature</span>
+          <h3>Pizza La Grange au Soleil</h3>
+          <p>Mozzarella, mortadelle, pistache, burrata, origan</p>
+          <span class="prix">25.-</span>
+        </div>
+      </article>
+      <article class="plat-vedette">
+        <figure class="photo photo-pates" role="img" aria-label="Emplacement pour une photo d'orecchiette"><figcaption>Photo (à fournir)</figcaption></figure>
+        <div class="corps">
+          <h3>Orecchiette gratinées au four et burrata</h3>
+          <p>Pâtes fraîches maison, sauce tomate</p>
+          <span class="prix">28.-</span>
+        </div>
+      </article>
+      <article class="plat-vedette">
+        <figure class="photo photo-terrasse" role="img" aria-label="Emplacement pour une photo de la burrata"><figcaption>Photo (à fournir)</figcaption></figure>
+        <div class="corps">
+          <h3>Burrata pugliese</h3>
+          <p>Jambon cru San Daniele</p>
+          <span class="prix">25.-</span>
+        </div>
+      </article>
+      <article class="plat-vedette">
+        <figure class="photo photo-salle" role="img" aria-label="Emplacement pour une photo de puccia"><figcaption>Photo (à fournir)</figcaption></figure>
+        <div class="corps">
+          <h3>Les puccias maison</h3>
+          <p>Le pain des Pouilles, garni au bœuf, au saumon grillé ou au poulpe grillé</p>
+          <span class="prix">26.- à 30.-</span>
+        </div>
+      </article>
+      <article class="plat-vedette">
+        <figure class="photo photo-tiramisu" role="img" aria-label="Emplacement pour une photo du tiramisu"><figcaption>Photo (à fournir)</figcaption></figure>
+        <div class="corps">
+          <h3>Tiramisu</h3>
+          <p>Pour finir le repas en douceur</p>
+          <span class="prix">9.-</span>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- FAIT MAISON -->
+<section class="alt" id="maison" aria-labelledby="t-maison">
+  <div class="wrap">
+    <div class="intro-sec">
+      <span class="manuscrit">Ce qui sort de notre cuisine</span>
+      <h2 id="t-maison">Fait maison, à l'italienne</h2>
+      <p>Les pâtes, les raviolis, les risottos et les puccias sont faits maison. Le café, le restaurant et la pizzeria sont réunis sous le même toit.</p>
+    </div>
+    <div class="maison-grid">
+      <article class="carte-service">
+        <div class="ico"><svg aria-hidden="true" viewBox="0 0 24 24"><path fill="currentColor" d="M4 6c3-2 13-2 16 0-3 2-13 2-16 0zm0 4c3-2 13-2 16 0-3 2-13 2-16 0zm0 4c3-2 13-2 16 0-3 2-13 2-16 0zm6 4h4l-1 3h-2z"/></svg></div>
+        <h3>Pâtes fraîches</h3>
+        <p>Orecchiette, tagliatelle, gnocchis, raviolis : tous faits maison.</p>
+      </article>
+      <article class="carte-service">
+        <div class="ico"><svg aria-hidden="true" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C7 2 3 4 2 6l10 16L22 6c-1-2-5-4-10-4zm-3 6a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm5 3a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z"/></svg></div>
+        <h3>Vingt pizzas</h3>
+        <p>De la Margherita à 15.- à la Pugliese, plus un menu enfant de 10.- à 12.-.</p>
+      </article>
+      <article class="carte-service">
+        <div class="ico"><svg aria-hidden="true" viewBox="0 0 24 24"><path fill="currentColor" d="M3 11h18v2H3zm2-4h14l-1 3H6zm1 8h12l-1 5H7z"/></svg></div>
+        <h3>Viandes &amp; grillades</h3>
+        <p>Tagliata de bœuf, entrecôtes, grillade de viande mixte, et des plats de la mer.</p>
+      </article>
+      <article class="carte-service">
+        <div class="ico"><svg aria-hidden="true"><use href="#i-sac"/></svg></div>
+        <h3>À emporter</h3>
+        <p>Appelez, commandez, passez chercher. Pas de livraison.</p>
+      </article>
+    </div>
+    <div class="provenance">
+      <svg width="22" height="22" style="flex:none;margin-top:3px;color:#5C6B2E" aria-hidden="true"><use href="#i-soleil"/></svg>
+      <p><strong>Provenance indiquée sur la carte :</strong> porc, poulet et bœuf de Suisse ; cheval du Paraguay et d'Argentine ; poisson surgelé.</p>
+    </div>
+  </div>
+</section>
+
+<!-- LA CARTE -->
+<section id="carte" aria-labelledby="t-carte">
+  <div class="wrap">
+    <div class="intro-sec">
+      <span class="manuscrit">Buon appetito</span>
+      <h2 id="t-carte">La carte</h2>
+      <p class="badge-carte a-confirmer"><strong>Carte à confirmer</strong> <span>Transcrite d'après les photos de la carte papier ; noms et prix des pizzas notamment à vérifier.</span></p>
+      <p>Prix en francs suisses. Touchez une rubrique pour l'ouvrir.</p>
+    </div>
+
+    <details class="rubrique" open>
+      <summary>Pâtes fraîches maison<small>Toutes nos pâtes sont fraîches et faites maison · 22.- à 30.-</small></summary>
+      <div class="rubrique-corps">
+        <div>
+          <h4>De la terre</h4>
+          <ul class="plats">
+            <li><span class="ligne"><span class="nom">Tagliatelle della Nonna</span><span class="pts"></span><span class="px">24.-</span></span></li>
+            <li><span class="ligne"><span class="nom">Parmigiana à l'aubergine</span><span class="pts"></span><span class="px">22.-</span></span></li>
+            <li><span class="ligne"><span class="nom">Lasagnes à la bolognaise maison</span><span class="pts"></span><span class="px">22.-</span></span><span class="d">viande hachée de bœuf</span></li>
+            <li><span class="ligne"><span class="nom">Pennés à la Boscaiola</span><span class="pts"></span><span class="px">25.-</span></span></li>
+            <li><span class="ligne"><span class="nom">Orecchiette cime di rapa</span><span class="pts"></span><span class="px">26.-</span></span><span class="d">saucisses des Pouilles</span></li>
+            <li><span class="ligne"><span class="nom">Orecchiette à la Brasciola</span><span class="pts"></span><span class="px">30.-</span></span><span class="d">sauce tomate, viande de cheval</span></li>
+            <li><span class="ligne"><span class="nom">Orecchiette gratinées au four et burrata</span><span class="pts"></span><span class="px">28.-</span></span><span class="d">sauce tomate</span></li>
+            <li><span class="ligne"><span class="nom">Pâtes fraîches à l'aubergine</span><span class="pts"></span><span class="px">23.-</span></span><span class="d">ricotta salée</span></li>
+            <li><span class="ligne"><span class="nom">Gnocchis à la Sorrentina</span><span class="pts"></span><span class="px">27.-</span></span></li>
+          </ul>
+        </div>
+        <div>
+          <h4>De la mer</h4>
+          <ul class="plats">
+            <li><span class="ligne"><span class="nom">Spaghetti aux fruits de mer</span><span class="pts"></span><span class="px">30.-</span></span></li>
+            <li><span class="ligne"><span class="nom">Tagliatelles au saumon</span><span class="pts"></span><span class="px">28.-</span></span><span class="d">orange, tomate cerise</span></li>
+            <li><span class="ligne"><span class="nom">Paccheri alle pescato</span><span class="pts"></span><span class="px">30.-</span></span><span class="d">espadon, tomate cerise, olive taggiasche</span></li>
+            <li><span class="ligne"><span class="nom">Gnocchis au safran et vongole</span><span class="pts"></span><span class="px">28.-</span></span></li>
+            <li><span class="ligne"><span class="nom">Spaghetti moules et mollica croquante</span><span class="pts"></span><span class="px">30.-</span></span></li>
+            <li><span class="ligne"><span class="nom">Spaghetti aux vongole</span><span class="pts"></span><span class="px">28.-</span></span></li>
+          </ul>
+          <h4>Raviolis frais maison</h4>
+          <ul class="plats">
+            <li><span class="ligne"><span class="nom">Ravioli à la crème de truffe</span><span class="pts"></span><span class="px">25.-</span></span></li>
+            <li><span class="ligne"><span class="nom">Raviolis farcis</span><span class="pts"></span><span class="px">28.-</span></span><span class="d">ricotta, saumon, sauce rosée</span></li>
+            <li><span class="ligne"><span class="nom">Raviolis au ragoût de cerf</span><span class="pts"></span><span class="px">28.-</span></span><span class="d">ricotta, pecorino</span></li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <details class="rubrique" open>
+      <summary>Pizzas<small>12 classiques et 8 spéciales · 15.- à 28.-</small></summary>
+      <div class="rubrique-corps">
+        <div>
+          <h4>Classiques</h4>
+          <ul class="plats">
+            <li><span class="ligne"><span class="nom">Margherita</span><span class="pts"></span><span class="px">15.-</span></span><span class="d">sauce tomate, mozzarella, origan</span></li>
+            <li><span class="ligne"><span class="nom">Marinara</span><span class="pts"></span><span class="px">15.-</span></span><span class="d">sauce tomate, ail, olive, origan</span></li>
+            <li><span class="ligne"><span class="nom">Prosciutto</span><span class="pts"></span><span class="px">20.-</span></span><span class="d">sauce tomate, mozzarella, jambon, origan</span></li>
+            <li><span class="ligne"><span class="nom">Santa Lucia</span><span class="pts"></span><span class="px">21.-</span></span><span class="d">sauce tomate, mozzarella, jambon, champignons, origan</span></li>
+            <li><span class="ligne"><span class="nom">Hawaï</span><span class="pts"></span><span class="px">21.-</span></span><span class="d">sauce tomate, mozzarella, jambon, ananas, origan</span></li>
+            <li><span class="ligne"><span class="nom">Quatre Saisons</span><span class="pts"></span><span class="px">23.-</span></span><span class="d">sauce tomate, mozzarella, jambon, champignons, poivron, artichaut, origan</span></li>
+            <li><span class="ligne"><span class="nom">Capricciosa</span><span class="pts"></span><span class="px">24.-</span></span><span class="d">sauce tomate, mozzarella, jambon, champignons, poivron, artichaut, œuf, origan</span></li>
+            <li><span class="ligne"><span class="nom">Napolitaine</span><span class="pts"></span><span class="px">22.-</span></span><span class="d">sauce tomate, mozzarella, anchois, câpres, olive, origan</span></li>
+            <li><span class="ligne"><span class="nom">Thon et oignon</span><span class="pts"></span><span class="px">22.-</span></span><span class="d">sauce tomate, mozzarella, thon, oignon, huile d'olive, origan</span></li>
+            <li><span class="ligne"><span class="nom">Diavola</span><span class="pts"></span><span class="px">22.-</span></span><span class="d">sauce tomate, mozzarella, salami piquant, origan</span></li>
+            <li><span class="ligne"><span class="nom">Quatre Fromages</span><span class="pts"></span><span class="px">23.-</span></span><span class="d">sauce tomate, mozzarella, gruyère, gorgonzola, brie, origan</span></li>
+            <li><span class="ligne"><span class="nom">Végétarienne</span><span class="pts"></span><span class="px">22.-</span></span><span class="d">sauce tomate, mozzarella, légumes de saison, origan</span></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Spéciales</h4>
+          <ul class="plats">
+            <li class="sig"><span class="ligne"><span class="nom">La Grange au Soleil</span><span class="pts"></span><span class="px">25.-</span></span><span class="d">mozzarella, mortadelle, pistache, burrata, origan</span></li>
+            <li><span class="ligne"><span class="nom">Miss Italia</span><span class="pts"></span><span class="px">25.-</span></span><span class="d">sauce tomate, mozzarella, tomates cerises, roquette, jambon de Parme, bufala, huile d'olive</span></li>
+            <li><span class="ligne"><span class="nom">Norvegese</span><span class="pts"></span><span class="px">26.-</span></span><span class="d">sauce tomate, mozzarella, saumon, oignon, câpres, origan</span></li>
+            <li><span class="ligne"><span class="nom">Tunisienne</span><span class="pts"></span><span class="px">25.-</span></span><span class="d">sauce tomate, mozzarella, poivron, olive, merguez, origan</span></li>
+            <li><span class="ligne"><span class="nom">Caprese</span><span class="pts"></span><span class="px">23.-</span></span><span class="d">mozzarella, fines tranches de tomate, bufala, huile d'olive, origan</span></li>
+            <li><span class="ligne"><span class="nom">Du patron</span><span class="pts"></span><span class="px">26.-</span></span><span class="d">sauce tomate, mozzarella, crevettes, ail, persil, origan</span></li>
+            <li><span class="ligne"><span class="nom">Fruits de mer</span><span class="pts"></span><span class="px">25.-</span></span><span class="d">sauce tomate, mozzarella, gambas, calamar, seiche, moules, poulpe, origan</span></li>
+            <li><span class="ligne"><span class="nom">La Pugliese</span><span class="pts"></span><span class="px">28.-</span></span><span class="d">mozzarella, cime di rapa, saucisse de porc au fenouil, origan</span></li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <details class="rubrique">
+      <summary>Risottos &amp; puccias maison<small>Risottos 28.- à 30.- · Puccias 26.- à 30.-</small></summary>
+      <div class="rubrique-corps">
+        <div>
+          <h4>Risottos maison</h4>
+          <ul class="plats">
+            <li><span class="ligne"><span class="nom">Risotto aux bolets</span><span class="pts"></span><span class="px">28.-</span></span></li>
+            <li><span class="ligne"><span class="nom">Risotto à la milanaise et osso buco</span><span class="pts"></span><span class="px">30.-</span></span></li>
+            <li><span class="ligne"><span class="nom">Risotto aux fruits de mer</span><span class="pts"></span><span class="px">28.-</span></span></li>
+            <li><span class="ligne"><span class="nom">Risotto aux gambas</span><span class="pts"></span><span class="px">28.-</span></span></li>
+            <li><span class="ligne"><span class="nom">Risotto aux gambas et betterave rouge</span><span class="pts"></span><span class="px">30.-</span></span></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Puccias maison</h4>
+          <ul class="plats">
+            <li><span class="ligne"><span class="nom">Puccia au bœuf 180 g</span><span class="pts"></span><span class="px">26.-</span></span><span class="d">salade, tomate, sauce cocktail, burrata</span></li>
+            <li><span class="ligne"><span class="nom">Puccia au saumon grillé</span><span class="pts"></span><span class="px">30.-</span></span><span class="d">courgette, tomate, salade, Philadelphia</span></li>
+            <li><span class="ligne"><span class="nom">Puccia au poulpe grillé</span><span class="pts"></span><span class="px">30.-</span></span><span class="d">aubergine, roquette, tomates cerises, burrata</span></li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <details class="rubrique">
+      <summary>Entrées &amp; salades<small>6.- à 34.-</small></summary>
+      <div class="rubrique-corps">
+        <div>
+          <h4>Entrées</h4>
+          <ul class="plats">
+            <li><span class="ligne"><span class="nom">Carpaccio de saumon</span><span class="pts"></span><span class="px">26.-</span></span><span class="d">orange, roquette, tomates cerises, toasts au beurre</span></li>
+            <li><span class="ligne"><span class="nom">Carpaccio de bœuf</span><span class="pts"></span><span class="px">24.-</span></span><span class="d">roquette et parmesan</span></li>
+            <li><span class="ligne"><span class="nom">Entrée à l'italienne</span><span class="pts"></span><span class="px">26.-</span></span><span class="d">charcuterie, fromages</span></li>
+            <li><span class="ligne"><span class="nom">Burrata pugliese</span><span class="pts"></span><span class="px">25.-</span></span><span class="d">jambon cru San Daniele</span></li>
+            <li><span class="ligne"><span class="nom">Tartare de bœuf à la méditerranéenne</span><span class="pts"></span><span class="px">34.-</span></span></li>
+            <li><span class="ligne"><span class="nom">Gambas panées</span><span class="pts"></span><span class="px">26.-</span></span><span class="d">sauce cocktail, agrumes, frites, légumes</span></li>
+            <li><span class="ligne"><span class="nom">Tomates mozzarella</span><span class="pts"></span><span class="px">20.-</span></span><span class="d">bufala, roquette</span></li>
+            <li><span class="ligne"><span class="nom">Moules frites à l'italienne</span><span class="pts"></span><span class="px">26.-</span></span></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Salades</h4>
+          <ul class="plats">
+            <li><span class="ligne"><span class="nom">Salade verte</span><span class="pts"></span><span class="px">6.-</span></span></li>
+            <li><span class="ligne"><span class="nom">Salade mêlée</span><span class="pts"></span><span class="px">8.-</span></span></li>
+            <li><span class="ligne"><span class="nom">Salade végétarienne</span><span class="pts"></span><span class="px">14.-</span></span></li>
+            <li><span class="ligne"><span class="nom">Salade César</span><span class="pts"></span><span class="px">20.-</span></span><span class="d">poulet, salade, tomates cerises, parmesan</span></li>
+            <li><span class="ligne"><span class="nom">Salade de poulpe</span><span class="pts"></span><span class="px">26.-</span></span><span class="d">pommes de terre, olives taggiasche</span></li>
+            <li><span class="ligne"><span class="nom">Salade de gambas à la catalane</span><span class="pts"></span><span class="px">26.-</span></span></li>
+            <li><span class="ligne"><span class="nom">Salade de fruits de mer</span><span class="pts"></span><span class="px">26.-</span></span></li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <details class="rubrique">
+      <summary>Viandes &amp; poissons<small>29.- à 50.-</small></summary>
+      <div class="rubrique-corps">
+        <div>
+          <h4>De la terre</h4>
+          <ul class="plats">
+            <li><span class="ligne"><span class="nom">Tagliata de bœuf</span><span class="pts"></span><span class="px">40.-</span></span><span class="d">240 g, tomate cerise, roquette, parmesan, frites, légumes</span></li>
+            <li><span class="ligne"><span class="nom">Magret de canard</span><span class="pts"></span><span class="px">30.-</span></span><span class="d">sauce miel, balsamique, orange, frites, légumes</span></li>
+            <li><span class="ligne"><span class="nom">Entrecôte de cheval</span><span class="pts"></span><span class="px">34.-</span></span><span class="d">240 g, frites, légumes</span></li>
+            <li><span class="ligne"><span class="nom">Entrecôte de bœuf</span><span class="pts"></span><span class="px">40.-</span></span><span class="d">240 g, frites, légumes</span></li>
+            <li><span class="ligne"><span class="nom">Côtelettes d'agneau</span><span class="pts"></span><span class="px">45.-</span></span><span class="d">bolets, polenta, frites</span></li>
+            <li><span class="ligne"><span class="nom">Tagliata de sanglier</span><span class="pts"></span><span class="px">45.-</span></span><span class="d">fruits rouges cuits au vin blanc, frites, légumes</span></li>
+            <li><span class="ligne"><span class="nom">Grillade de viande mixte</span><span class="pts"></span><span class="px">50.-</span></span><span class="d">bœuf, cheval, agneau, canard, merguez et saucisse de bœuf</span></li>
+          </ul>
+          <h4>Sauces pour les viandes</h4>
+          <ul class="plats">
+            <li><span class="ligne"><span class="nom">Bolets</span><span class="pts"></span><span class="px">8.-</span></span></li>
+            <li><span class="ligne"><span class="nom">Café de Paris</span><span class="pts"></span><span class="px">6.-</span></span></li>
+            <li><span class="ligne"><span class="nom">Poivre vert</span><span class="pts"></span><span class="px">7.-</span></span></li>
+            <li><span class="ligne"><span class="nom">Morilles</span><span class="pts"></span><span class="px">10.-</span></span></li>
+          </ul>
+        </div>
+        <div>
+          <h4>De la mer</h4>
+          <ul class="plats">
+            <li><span class="ligne"><span class="nom">Fritto misto</span><span class="pts"></span><span class="px">29.-</span></span><span class="d">calamar, gambas, seiche, légumes, sauce cocktail, frites</span></li>
+            <li><span class="ligne"><span class="nom">Gambas géantes</span><span class="pts"></span><span class="px">35.-</span></span><span class="d">sauce ail, frites, légumes</span></li>
+            <li><span class="ligne"><span class="nom">Tranches de saumon grillées</span><span class="pts"></span><span class="px">30.-</span></span><span class="d">sauce verte, frites, légumes</span></li>
+            <li><span class="ligne"><span class="nom">Filets de pangasius</span><span class="pts"></span><span class="px">30.-</span></span><span class="d">tomate cerise, olive taggiasche, câpres, artichaut, frites, légumes</span></li>
+            <li><span class="ligne"><span class="nom">Filets de perche et salade mêlée en entrée</span><span class="pts"></span><span class="px">35.-</span></span><span class="d">frites, légumes, sauce tartare</span></li>
+            <li><span class="ligne"><span class="nom">Espadon à la sauce du chef</span><span class="pts"></span><span class="px">35.-</span></span><span class="d">pomme de terre au four, légumes, sauce ail</span></li>
+            <li><span class="ligne"><span class="nom">Dorade grillée</span><span class="pts"></span><span class="px">30.-</span></span><span class="d">pomme de terre au four, légumes, sauce persil</span></li>
+            <li><span class="ligne"><span class="nom">Poulpe snacké</span><span class="pts"></span><span class="px">35.-</span></span><span class="d">purée de pommes de terre</span></li>
+          </ul>
+        </div>
+        <p class="mention pleine">Provenance : porc, poulet, bœuf (Suisse) ; cheval (Paraguay, Argentine) ; poisson (surgelé).</p>
+      </div>
+    </details>
+
+    <details class="rubrique">
+      <summary>Menu enfant<small>10.- à 12.-</small></summary>
+      <div class="rubrique-corps">
+        <ul class="plats pleine">
+          <li><span class="ligne"><span class="nom">Pâtes à la tomate</span><span class="pts"></span><span class="px">10.-</span></span></li>
+          <li><span class="ligne"><span class="nom">Nuggets de poulet, frites maison</span><span class="pts"></span><span class="px">12.-</span></span></li>
+          <li><span class="ligne"><span class="nom">Pizza Topolino</span><span class="pts"></span><span class="px">11.-</span></span><span class="d">sauce tomate, mozzarella, origan</span></li>
+          <li><span class="ligne"><span class="nom">Pizza Orsetto</span><span class="pts"></span><span class="px">11.-</span></span><span class="d">sauce tomate, mozzarella, jambon, origan</span></li>
+          <li><span class="ligne"><span class="nom">Pizza Maialino</span><span class="pts"></span><span class="px">12.-</span></span><span class="d">sauce tomate, mozzarella, wienerli, frites</span></li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="rubrique">
+      <summary>Desserts<small>Tiramisu, crème brûlée à la pistache, panna cotta…</small></summary>
+      <div class="rubrique-corps">
+        <ul class="plats pleine">
+          <li><span class="ligne"><span class="nom">Tiramisu</span><span class="pts"></span><span class="px">9.-</span></span></li>
+          <li><span class="ligne"><span class="nom">Crème brûlée</span><span class="pts"></span><span class="px">9.-</span></span></li>
+          <li><span class="ligne"><span class="nom">Crème brûlée à la pistache</span><span class="pts"></span><span class="px">9.-</span></span></li>
+          <li><span class="ligne"><span class="nom">Fondant au chocolat</span><span class="pts"></span><span class="px">13.-</span></span></li>
+          <li><span class="ligne"><span class="nom">Panna cotta</span><span class="pts"></span><span class="px">9.-</span></span><span class="d">fruits rouges</span></li>
+          <li><span class="ligne"><span class="nom">Tarte du chef</span><span class="pts"></span><span class="px">9.-</span></span></li>
+          <li><span class="ligne"><span class="nom">Mousse au chocolat</span><span class="pts"></span><span class="px">9.-</span></span></li>
+          <li><span class="ligne"><span class="nom">Millefeuille</span><span class="pts"></span><span class="px">12.-</span></span></li>
+          <li><span class="ligne"><span class="nom">Glaces</span><span class="pts"></span><span class="px">3.50</span></span><span class="d">chocolat, vanille, fraise, caramel, café, pistache, stracciatella, sorbet citron, sorbet abricot (prix par boule, à confirmer)</span></li>
+        </ul>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- HORAIRES -->
+<section class="alt" id="horaires" aria-labelledby="t-horaires">
+  <div class="wrap">
+    <div class="intro-sec">
+      <span class="manuscrit">Quand passer nous voir</span>
+      <h2 id="t-horaires">Horaires</h2>
+    </div>
+    <div class="horaires-grid">
+      <div class="carte-papier a-confirmer">
+        <h3>Semaine type <span class="badge-ex">exemple</span></h3>
+        <p class="note-ex">Horaires indicatifs à remplacer par les horaires réels de l'auberge.</p>
+        <table>
+          <caption class="note-ex" style="caption-side:bottom;text-align:left;padding-top:10px">Tableau d'exemple, non contractuel.</caption>
+          <tbody>
+            <tr><th scope="row">Lundi</th><td>8h00 – 22h30</td></tr>
+            <tr><th scope="row">Mardi</th><td>8h00 – 22h30</td></tr>
+            <tr><th scope="row">Mercredi</th><td>8h00 – 22h30</td></tr>
+            <tr><th scope="row">Jeudi</th><td>8h00 – 22h30</td></tr>
+            <tr><th scope="row">Vendredi</th><td>8h00 – 22h30</td></tr>
+            <tr><th scope="row">Samedi</th><td>à préciser</td></tr>
+            <tr><th scope="row">Dimanche</th><td>à préciser</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <div class="sur">
+          <svg width="22" height="22" style="flex:none;margin-top:3px;color:#5C6B2E" aria-hidden="true"><use href="#i-horloge"/></svg>
+          <p style="margin:0"><strong>Ce que l'on sait :</strong> fermeture à 22h30 le jour où la fiche a été relevée. Le plus simple pour être sûr : un coup de fil.</p>
+        </div>
+        <div class="affluence">
+          <h3 style="font-size:1.15rem">Le midi, c'est vite plein</h3>
+          <p>L'auberge est très fréquentée entre 11h et 14h, et de nouveau le soir entre 19h et 21h. Pensez à appeler avant de venir.</p>
+          <a class="btn btn-appel" href="tel:+41244711512"><svg aria-hidden="true"><use href="#i-tel"/></svg>Réserver par téléphone</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- L'AUBERGE -->
+<section id="auberge" aria-labelledby="t-auberge">
+  <div class="wrap histoire-grid">
+    <figure class="photo photo-salle" role="img" aria-label="Emplacement pour une photo de la salle" style="min-height:320px">
+      <figcaption>Photo de la salle (à fournir)</figcaption>
+    </figure>
+    <div>
+      <span class="manuscrit">Entrez, installez-vous</span>
+      <h2 id="t-auberge">L'esprit de la maison</h2>
+      <p class="phrase">L'ambiance est notée 5 sur 5 par les visiteurs sur Tripadvisor.</p>
+      <p>Une auberge de village à l'accent italien, une terrasse sous les parasols, des pâtes faites maison. On y vient à midi entre collègues, le soir en famille, le week-end entre amis.</p>
+      <div class="bloc-ex a-confirmer">
+        <h3 style="font-size:1.1rem">Notre histoire <span class="badge-ex">exemple</span></h3>
+        <p style="margin:0">Emplacement pour l'histoire de la maison : qui tient l'auberge, depuis quand, d'où viennent les recettes. Texte à écrire avec le patron.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GALERIE -->
+<section class="alt" id="terrasse" aria-labelledby="t-terrasse">
+  <div class="wrap">
+    <div class="intro-sec">
+      <span class="manuscrit">Quand le soleil est là</span>
+      <h2 id="t-terrasse">La terrasse et la salle</h2>
+      <p>Parasols, tables dehors et une auberge qui porte bien son nom.</p>
+    </div>
+    <div class="galerie">
+      <figure class="photo photo-terrasse" role="img" aria-label="Emplacement pour une photo de la terrasse"><figcaption>Photo de la terrasse (à fournir)</figcaption></figure>
+      <figure class="photo photo-pizza" role="img" aria-label="Emplacement pour une photo de pizza"><figcaption>Photo d'une pizza (à fournir)</figcaption></figure>
+      <figure class="photo photo-pates" role="img" aria-label="Emplacement pour une photo de pâtes fraîches"><figcaption>Photo des pâtes fraîches (à fournir)</figcaption></figure>
+      <figure class="photo photo-salle" role="img" aria-label="Emplacement pour une photo de la salle"><figcaption>Photo de la salle (à fournir)</figcaption></figure>
+      <figure class="photo photo-tiramisu" role="img" aria-label="Emplacement pour une photo d'un dessert"><figcaption>Photo d'un dessert (à fournir)</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- AVIS -->
+<section id="avis" aria-labelledby="t-avis">
+  <div class="wrap">
+    <div class="intro-sec">
+      <span class="manuscrit">Ce qu'en disent les clients</span>
+      <h2 id="t-avis">Les notes de nos clients</h2>
+    </div>
+    <div class="notes">
+      <div class="note-carte">
+        <div class="gros">4,5<span style="font-size:1.4rem">/5</span></div>
+        <div class="etoiles" aria-hidden="true">★★★★½</div>
+        <span class="src">Google · 305 avis</span>
+      </div>
+      <div class="note-carte">
+        <div class="gros">5,0<span style="font-size:1.4rem">/5</span></div>
+        <div class="etoiles" aria-hidden="true">★★★★★</div>
+        <span class="src">Ambiance · Tripadvisor</span>
+      </div>
+      <div class="note-carte">
+        <div class="gros">4,3<span style="font-size:1.4rem">/5</span></div>
+        <div class="etoiles" aria-hidden="true">★★★★</div>
+        <span class="src">Service · Tripadvisor</span>
+      </div>
+    </div>
+    <p style="margin-top:18px"><a href="https://www.google.com/maps/search/?api=1&amp;query=Auberge+de+la+Grange+au+Soleil+Collombey-Muraz" target="_blank" rel="noopener">Lire les avis sur Google</a></p>
+    <div class="bloc-ex a-confirmer" style="margin-top:22px">
+      <strong>Emplacement pour des avis clients</strong> <span class="badge-ex">exemple</span>
+      <p class="note-ex" style="margin:.4em 0 0">Quelques avis réels, choisis avec le patron et cités avec leur source. Aucun avis n'est inventé.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ACCES -->
+<section class="alt" id="acces" aria-labelledby="t-acces">
+  <div class="wrap acces-grid">
+    <div>
+      <span class="manuscrit">Venir nous voir</span>
+      <h2 id="t-acces">Accès &amp; contact</h2>
+      <ul class="infos">
+        <li><svg aria-hidden="true"><use href="#i-pin"/></svg>
+          <div><strong>Adresse</strong><br><a href="https://www.google.com/maps/search/?api=1&amp;query=Auberge+de+la+Grange+au+Soleil+Collombey-Muraz" target="_blank" rel="noopener">Rte des Brêches 7, 1893 Collombey-Muraz</a></div></li>
+        <li><svg aria-hidden="true"><use href="#i-tel"/></svg>
+          <div><strong>Téléphone</strong><br><a href="tel:+41244711512">024 471 15 12</a> · réservation et à emporter</div></li>
+        <li><svg aria-hidden="true"><use href="#i-fauteuil"/></svg>
+          <div><strong>Accessibilité</strong><br>Accessible en fauteuil roulant</div></li>
+        <li><svg aria-hidden="true"><use href="#i-sac"/></svg>
+          <div><strong>Services</strong><br>Sur place et à emporter (pas de livraison) · 20 à 30 CHF par personne</div></li>
+        <li class="a-confirmer"><svg aria-hidden="true"><use href="#i-soleil"/></svg>
+          <div><strong>Parking</strong> <span class="badge-ex">exemple</span><br>Places de parc à proximité, à confirmer</div></li>
+      </ul>
+    </div>
+    <div class="carte-plan">
+      <a href="https://www.google.com/maps/search/?api=1&amp;query=Auberge+de+la+Grange+au+Soleil+Collombey-Muraz" target="_blank" rel="noopener">Ouvrir le plan dans Google Maps</a>
+    </div>
+  </div>
+</section>
+
+<section class="final" aria-labelledby="t-final">
+  <div class="wrap">
+    <h2 id="t-final">On vous garde une table ?</h2>
+    <p>Un coup de fil suffit pour réserver ou commander vos pizzas et vos pâtes à emporter.</p>
+    <a class="tel-gros" href="tel:+41244711512">024 471 15 12</a>
+    <div class="btn-row">
+      <a class="btn btn-appel" href="tel:+41244711512"><svg aria-hidden="true"><use href="#i-tel"/></svg>Appeler</a>
+      <a class="btn btn-route" href="https://www.google.com/maps/search/?api=1&amp;query=Auberge+de+la+Grange+au+Soleil+Collombey-Muraz" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-pin"/></svg>Itinéraire</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<div class="vichy" aria-hidden="true"></div>
+<footer>
+  <div class="wrap">
+    <strong style="font-family:var(--titre);font-size:1.15rem;color:#FFE7B0">Auberge de la Grange au Soleil</strong>
+    <span>Café · Restaurant · Pizzeria · cuisine italienne · sur place et à emporter</span>
+    <span><a href="https://www.google.com/maps/search/?api=1&amp;query=Auberge+de+la+Grange+au+Soleil+Collombey-Muraz" target="_blank" rel="noopener">Rte des Brêches 7, 1893 Collombey-Muraz</a> · <a href="tel:+41244711512">024 471 15 12</a></span>
+    <small>Maquette de démonstration : la carte et les éléments marqués « exemple » sont à confirmer avec l'établissement.</small>
+  </div>
+</footer>
+
+<nav class="barre" aria-label="Actions rapides">
+  <a class="appel" href="tel:+41244711512"><svg aria-hidden="true"><use href="#i-tel"/></svg>Appeler</a>
+  <a href="https://www.google.com/maps/search/?api=1&amp;query=Auberge+de+la+Grange+au+Soleil+Collombey-Muraz" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-pin"/></svg>Itinéraire</a>
+  <a href="#carte"><svg aria-hidden="true"><use href="#i-carte"/></svg>Carte</a>
+  <a href="#horaires"><svg aria-hidden="true"><use href="#i-horloge"/></svg>Horaires</a>
+</nav>
+</body>
+</html>
