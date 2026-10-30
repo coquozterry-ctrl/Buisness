@@ -22,16 +22,19 @@ Conçu pour une **Prusa XL multi-têtes** (plateau 360 × 360 × 360 mm).
   cassures en travers et gerçures fines. Elle est continue d'un tronçon à l'autre.
 - **12 lambeaux d'écorce soulevés** : collés en bas, décollés de 4 à 5 mm et déchiquetés en haut.
   Ils montent en s'écartant légèrement, donc s'impriment sans support.
-- **9 nœuds creux** et **9 branches cassées** répartis sur la hauteur, loin des jointures.
+- **9 nœuds creux** et **8 gros départs de branches** (Ø 2 à 3 cm, gros bourrelet) cassés en éclats,
+  avec les cernes du bois visibles au bout.
 - En haut, pas de « coupe » : 3 grosses griffes (la suite des 3 brins), coudées et à section
-  aplatie comme du vrai bois, crochues à l'arrière, avec des rameaux ; 6 racines plus fines
-  enveloppent la base et montent entre les cristaux.
+  aplatie comme du vrai bois, crochues à l'arrière, avec des rameaux ; 6 racines enveloppent
+  la base et le bois remonte en lèvre irrégulière autour des cristaux.
+- Les **cristaux** sont bas et serrés, et c'est le bois qui les recouvre : on n'en voit que
+  des morceaux entre les racines, comme sur la photo.
   Elles pointent vers le haut (42 à 60°) pour s'imprimer sans support. Le bout éclaté
   (bois clair et échardes) est une pièce séparée, à imprimer dans une 4e couleur.
 - La **veine dorée** est une pièce séparée, logée au fond du sillon entre deux brins : à imprimer
   dans une 2e couleur (PLA soie or ou cuivre).
-- Les **cristaux** sont imprimés en même temps que la main, dans une 3e couleur (PLA
-  translucide orange ou fumé) : les doigts les enserrent, ils ne s'enlèvent pas.
+- Les cristaux sont imprimés en même temps que la main, dans une 3e couleur : ils sont pris
+  dans le bois et ne s'enlèvent pas.
 - La bougie LED se loge dans le haut du col. On retire la main pour l'allumer.
 
 ## Fichiers (`stl/`) et filaments
@@ -42,14 +45,14 @@ Chaque pièce multi-couleur = plusieurs STL à charger **ensemble** dans PrusaSl
 |---|---|
 | T1 | PLA brun écorce (brun chocolat / « tree brown ») |
 | T2 | PLA soie or ou cuivre (veine) |
-| T3 | PLA translucide orange ou ambre (cristaux) |
-| T4 | PLA beige / bois clair (bouts cassés). Un PLA chargé bois va aussi, mais avec une buse de 0,6 mm |
+| T3 | PLA translucide ambre ou fumé (cristaux) : plus discret et plus proche de la photo que l'orange vif |
+| T4 | PLA beige / bois clair (bouts des branches cassées). Un PLA chargé bois va aussi, mais avec une buse de 0,6 mm |
 
 | Pièce | Fichiers | Taille (mm) | Outils |
 |---|---|---|---|
 | Fût 1 à 4 (1 = pied) | `fut_N_ecorce.stl` + `fut_N_veine.stl` (+ `fut_N_bois_clair.stl`) | ~75-100 × 75 × 350 | T1, T2, T4 |
 | Col en S | `tete_1_col_ecorce.stl` + `tete_1_col_veine.stl` + `tete_1_col_bois_clair.stl` | ~119 × 118 × 325 | T1, T2, T4 |
-| Griffes + cristaux | `tete_2_main_ecorce.stl` + `tete_2_main_cristaux.stl` | ~118 × 138 × 190 | T1, T3 translucide |
+| Griffes + cristaux | `tete_2_main_ecorce.stl` + `tete_2_main_cristaux.stl` | ~106 × 129 × 167 | T1, T3 translucide |
 
 Le tronçon 2 n'a pas de branche cassée : pas de fichier `bois_clair` pour lui.
 
@@ -91,7 +94,7 @@ Imprimée en brun, l'écorce est déjà crédible. Pour un vrai rendu d'arbre : 
 foncé dans les sillons, essuyé tout de suite, puis un brossage à sec beige-gris sur les reliefs.
 Vernis mat par-dessus, en masquant la veine, les bouts cassés et les cristaux.
 
-Les branches cassées dépassent de 1,5 à 4 cm : en cortège, elles peuvent accrocher un costume
+Les départs de branches dépassent de 2 à 4 cm : en cortège, elles peuvent accrocher un costume
 ou casser sur un choc. Elles sont pleines et ancrées dans le tronc, mais si l'une casse, un
 point de colle époxy suffit.
 

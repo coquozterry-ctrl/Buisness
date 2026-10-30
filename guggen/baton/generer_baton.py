@@ -31,7 +31,7 @@ ONDULATION = 6.0           # amplitude des ondulations du tronc
 PROF_DOUILLE = 120         # profondeur du tube dans le col
 DIAM_LED = 42.0            # bougie LED « chauffe-plat » Ø38 mm
 NB_NOEUDS_CREUX = 9
-NB_CHICOTS = 9             # branches cassées
+NB_CHICOTS = 8             # départs de branches cassées
 NB_PLAQUES = 12            # lambeaux d'écorce soulevés
 GRAINE = 7                 # change la graine pour un autre bâton "unique"
 
@@ -306,25 +306,30 @@ def noeuds_creux():
 
 
 def chicot(g, p, out):
-    """Moignon de branche écorcé, cassé net, avec le bois clair éclaté au bout."""
-    e = math.radians(g.uniform(42, 60))                       # pointe vers le haut : imprimable
+    """Gros départ de branche écorcé, cassé en éclats, cernes du bois visibles au bout."""
+    e = math.radians(g.uniform(45, 62))                       # pointe vers le haut : imprimable
     d = math.cos(e) * out + math.sin(e) * np.array([0, 0, 1.0])
-    r0, L = g.uniform(5, 10), g.uniform(15, 40)
-    ancrage = 1.6 * r0 + 4
+    r0, L = g.uniform(10, 15), g.uniform(18, 35)
+    ancrage = 1.4 * r0 + 4
     t = np.linspace(0, 1, max(int((L + ancrage) / PAS), 20))
-    pts = p - ancrage * d + np.outer(t, d * (L + ancrage)) + np.outer(t ** 2, [0, 0, 1.0]) * g.uniform(0, 0.15) * L
+    pts = p - ancrage * d + np.outer(t, d * (L + ancrage)) + np.outer(t ** 2, [0, 0, 1.0]) * g.uniform(0, 0.12) * L
     tb = ancrage / (L + ancrage)
-    r = r0 * (1 + 0.3 * np.exp(-np.clip(t - tb, 0, None) / 0.08)) * (1 - 0.2 * t)
-    ecorce_ch = tube_balaye(pts, r, n=72, texture=np.full(len(t), 0.6))
-    rc = r[-1] * 0.78
-    coeur_ch = [Manifold.cylinder(4, rc, rc, 48).translate((0, 0, -3.5))]
-    for _ in range(g.integers(5, 9)):                          # échardes
-        a, rr = g.uniform(0, 2 * math.pi), g.uniform(0, rc * 0.75)
-        x, y, w = rr * math.cos(a), rr * math.sin(a), g.uniform(1.0, 2.0)
-        base = [[x + w * math.cos(b), y + w * math.sin(b), 0] for b in (0, 2.1, 4.2)]
-        pointe = [[x + g.uniform(-1.5, 1.5), y + g.uniform(-1.5, 1.5), g.uniform(2, 3 + r0 * 0.6)]]
-        coeur_ch.append(Manifold.hull_points(np.array(base + pointe)))
-    coeur_ch = placer(union(coeur_ch), pts[-1], pts[-1] - pts[-2])
+    r = r0 * (1 + 0.55 * np.exp(-np.clip(t - tb, 0, None) / 0.15)) * (1 - 0.15 * t)   # gros bourrelet
+    ecorce_ch = tube_balaye(pts, r, n=120, texture=np.full(len(t), 0.8))
+
+    rc = r[-1] * 0.85
+    p1, p2, ph = g.uniform(0, 6.3), g.uniform(0, 6.3), g.uniform(0.6, 1.0)
+
+    def casser(v):                                             # cassure en gros éclats + cernes
+        x, y, z = v[:, 0], v[:, 1], v[:, 2]
+        a, rho = np.arctan2(y, x), np.hypot(x, y) / rc
+        haut = (z > 0.99).astype(float)                       # seulement la face du bout
+        eclats = rho * (3.5 * np.sin(2 * a + p1) + 2.0 * np.sin(3 * a + p2)) * ph
+        cernes = -0.35 * np.cos(rho * rc * 2.4) ** 8
+        return np.stack([x, y, z + haut * (np.maximum(eclats, -1.0) + 1.5 + cernes)], -1)
+
+    coeur_ch = Manifold.cylinder(2.5, rc, rc, 96).translate((0, 0, -1.5)).refine_to_length(0.7).warp_batch(casser)
+    coeur_ch = placer(coeur_ch, pts[-1], pts[-1] - pts[-2])
     return ecorce_ch - coeur_ch, coeur_ch
 
 
@@ -400,16 +405,16 @@ def cristal(g, r, h, inclin, azim, base):
 
 def grappe(o) -> Manifold:
     g = np.random.default_rng(GRAINE + 2)
-    pieces = [cylindre(27, 6, o[2] - 4, o[0], o[1]),                    # socle, laisse passer la lumière
-              cristal(g, 16, 125, 4, 30, o)]
-    for k in range(9):
-        a = 2 * math.pi * k / 9 + g.uniform(-0.25, 0.25)
-        d = g.uniform(9, 17)
-        pieces.append(cristal(g, g.uniform(6, 11), g.uniform(35, 90), g.uniform(12, 32),
+    pieces = [cylindre(24, 6, o[2] - 4, o[0], o[1]),                    # socle, laisse passer la lumière
+              cristal(g, 12, 62, 8, 30, o)]
+    for k in range(8):                                                  # grappe basse et serrée
+        a = 2 * math.pi * k / 8 + g.uniform(-0.25, 0.25)
+        d = g.uniform(7, 14)
+        pieces.append(cristal(g, g.uniform(4.5, 8), g.uniform(18, 42), g.uniform(15, 40),
                               math.degrees(a) + 90, o + [d * math.cos(a), d * math.sin(a), 0]))
-    for k in range(40):                                                 # druse au pied
+    for k in range(30):                                                 # druse au pied
         a = g.uniform(0, 2 * math.pi)
-        d = g.uniform(14, 26)
+        d = g.uniform(10, 22)
         pieces.append(cristal(g, g.uniform(1.3, 3.0), g.uniform(3, 10), g.uniform(10, 50),
                               math.degrees(a) + 90, o + [d * math.cos(a), d * math.sin(a), 1.5]))
     return union(pieces)
@@ -511,7 +516,9 @@ def main_griffue():
     th = np.linspace(0, 2 * math.pi, 240, endpoint=False)
     Z, TH = np.meshgrid(zs, th, indexing="ij")
     R = rayon_coeur(Z_COL1) - 1 + 0 * Z
-    paume = loft(texturer(np.stack([cx + R * np.cos(TH), cy + R * np.sin(TH), Z], -1)))
+    levre = 5 + 10 * np.abs(np.sin(3 * TH + 1.1)) + 3 * np.sin(7 * TH + 0.4)   # le bois monte autour des cristaux
+    Zl = Z + lisse((Z - (Z_COL1 + HP - 15)) / 15) * levre
+    paume = loft(texturer(np.stack([cx + R * np.cos(TH), cy + R * np.sin(TH), Zl], -1)))
 
     g = np.random.default_rng(GRAINE + 3)
     dos = math.atan2(-cy, -cx) if abs(cx) + abs(cy) > 1 else 0.0       # côté opposé à la pente
@@ -520,24 +527,24 @@ def main_griffue():
     for k in range(3):                                                  # grosses griffes
         a0 = float(angle_brin(k, Z_COL1))
         arr = max(0.0, math.cos(a0 - dos))
-        pts = griffe(g, cx, cy, a0, e0, Z_COL1 - 20, 250 + 110 * arr + g.uniform(-15, 15),
-                     g.uniform(22, 32), 20 + 45 * arr, g.uniform(0.4, 0.8) * (1 if k % 2 else -1))
+        pts = griffe(g, cx, cy, a0, e0, Z_COL1 - 20, 230 + 90 * arr + g.uniform(-15, 15),
+                     g.uniform(18, 26), 28 + 50 * arr, g.uniform(0.4, 0.8) * (1 if k % 2 else -1))
         tube, r = branche(g, pts, RAYON_BRIN + 3, 2.0, aplat=0.75)
         bois.append(tube)
         for s0 in g.uniform(0.35, 0.65, 1 + int(arr > 0.3)):
             bois.append(rameau(g, pts, r, s0))
     for k in range(6):                                                  # racines qui enveloppent
         a0 = float(angle_brin(0, Z_COL1)) + math.pi / 3 * (k + 0.5) + g.uniform(-0.2, 0.2)
-        pts = griffe(g, cx, cy, a0, float(R[0, 0]) + 1, Z_COL1 - 10, g.uniform(150, 220),
-                     g.uniform(10, 20), g.uniform(5, 15), g.uniform(-0.9, 0.9))
-        bois.append(branche(g, pts, g.uniform(7, 10), 1.4, aplat=0.7)[0])
+        pts = griffe(g, cx, cy, a0, float(R[0, 0]) + 1, Z_COL1 - 10, g.uniform(130, 190),
+                     g.uniform(6, 14), g.uniform(14, 24), g.uniform(-0.9, 0.9))
+        bois.append(branche(g, pts, g.uniform(9, 13), 1.6, aplat=0.7)[0])
 
     main = union(bois) ^ tranche(Z_COL1, Z_COL1 + 500)
     main = main - cylindre(R_TENON + JEU / 2, H_TENON, Z_COL1 - 1, cx, cy)        # mortaise
-    main = main - cylindre(DIAM_LED / 2, HP + 1, Z_COL1, cx, cy)                  # chambre de lumière
+    main = main - cylindre(DIAM_LED / 2, HP + 40, Z_COL1, cx, cy)                 # chambre de lumière
     main = main - trous_goupilles()
-    cr = grappe(np.array([cx, cy, Z_COL1 + HP]))
-    return main - cr, cr
+    cr = grappe(np.array([cx, cy, Z_COL1 + HP])) - main                  # le bois recouvre les cristaux
+    return main, cr
 
 
 # ---------------------------------------------------------------- MAIN
