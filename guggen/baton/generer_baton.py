@@ -32,13 +32,14 @@ PROF_DOUILLE = 120         # profondeur du tube dans le col
 DIAM_LED = 42.0            # bougie LED « chauffe-plat » Ø38 mm
 NB_NOEUDS_CREUX = 9
 NB_CHICOTS = 9             # branches cassées
+NB_PLAQUES = 12            # lambeaux d'écorce soulevés
 GRAINE = 7                 # change la graine pour un autre bâton "unique"
 
 PAS = 0.7                  # finesse du maillage (taille des fissures ≈ 2 mm)
 SORTIE = Path(__file__).parent
 
 R_ALESAGE = DIAM_TUBE / 2 + JEU / 2
-PROF_ECORCE = 3.4
+PROF_ECORCE = 5.0
 R_COEUR = R_ALESAGE + PAROI_MIN + PROF_ECORCE
 Z_COL0 = LONGUEUR_FUT
 Z_COL1 = LONGUEUR_FUT + 300        # col en S (pièce de 300 mm + tenon)
@@ -128,7 +129,8 @@ class Cellules:
         return (d[:, 1] - d[:, 0]).reshape(p.shape[:-1]), self.h[i[:, 0]].reshape(p.shape[:-1])
 
 
-PLAQUES = Cellules(8.0, 4.0, GRAINE)        # plaques allongées : sillons d'écorce d'arbre
+PLAQUES = Cellules(10.0, 3.5, GRAINE)       # plaques allongées : sillons d'écorce d'arbre
+TRAVERS = Cellules(5.0, 0.5, GRAINE + 2)    # cassures en travers des plaques
 GERCURES = Cellules(3.0, 1.8, GRAINE + 1)
 
 
@@ -136,10 +138,13 @@ def ecorce(p):
     """Déplacement (mm, négatif = vers l'intérieur) de l'écorce au point p."""
     e1, h1 = PLAQUES(p)
     e2, _ = GERCURES(p)
-    fissure = np.clip(1 - e1 / 2.0, 0, 1) ** 1.3
+    e3, _ = TRAVERS(p)
+    sillon = np.clip(1 - e1 / 3.2, 0, 1) ** 1.4                # sillons profonds entre les plaques
+    plaque = (1.3 + 0.9 * h1) * (1 - sillon)                     # plaques qui ressortent
+    travers = np.clip(1 - e3 / 0.9, 0, 1) * (1 - sillon)
     gercure = np.clip(1 - e2 / 0.7, 0, 1)
     fibres = np.sin(p[..., 2] * 0.9 + 3 * np.sin(p[..., 0] * 0.21) + 3 * np.sin(p[..., 1] * 0.19))
-    return -2.6 * fissure + 0.5 * h1 * (1 - fissure) - 0.5 * gercure + 0.15 * fibres
+    return plaque - 3.6 * sillon - 1.1 * travers - 0.4 * gercure + 0.15 * fibres
 
 
 def texturer(anneaux, echelle=1.0):
@@ -147,8 +152,8 @@ def texturer(anneaux, echelle=1.0):
     return anneaux + normales(anneaux) * d[..., None]
 
 
-def tube_balaye(pts, rayons, n=24, texture=None):
-    """Tube le long d'une courbe 3D (repère par transport parallèle)."""
+def tube_balaye(pts, rayons, n=24, texture=None, aplat=1.0):
+    """Tube le long d'une courbe 3D (repère par transport parallèle), section ovale si aplat < 1."""
     pts = np.asarray(pts, float)
     tang = np.gradient(pts, axis=0)
     tang /= np.linalg.norm(tang, axis=1)[:, None]
@@ -160,7 +165,7 @@ def tube_balaye(pts, rayons, n=24, texture=None):
         nrm = nrm - np.dot(nrm, t) * t
         nrm /= np.linalg.norm(nrm)
         b = np.cross(t, nrm)
-        anneaux.append(p + r * (np.outer(np.cos(th), nrm) + np.outer(np.sin(th), b)))
+        anneaux.append(p + r * (np.outer(np.cos(th), nrm) + aplat * np.outer(np.sin(th), b)))
     anneaux = np.array(anneaux)
     if texture is not None:
         anneaux = texturer(anneaux, np.asarray(texture)[:, None] * np.ones(n))
@@ -205,7 +210,7 @@ def rayon_coeur(z):
 
 def ecart_brins(z):
     pied = 9.0 * np.exp(-z / 45.0)                                 # le pied s'évase comme des racines
-    return 13.0 + 1.5 * np.sin(z / 133.0) + pied + 19.0 * lisse((z - Z_COL0 - 60) / 240)
+    return 14.5 + 1.5 * np.sin(z / 133.0) + pied + 19.0 * lisse((z - Z_COL0 - 60) / 240)
 
 
 g0 = np.random.default_rng(GRAINE)
@@ -286,7 +291,15 @@ def noeuds_creux():
     for z, k in emplacements(NB_NOEUDS_CREUX, 25, 25, GRAINE + 6):
         p, out = point_exterieur(k, z)
         r = g.uniform(6, 9)
-        plus.append((z, Manifold.sphere(r * 1.25, 48).scale((1, 1, 1.5)).translate(tuple(p - out * r * 0.7))))
+        c = p - out * r * 0.7
+        bosse = Manifold.sphere(r * 1.25, 48).scale((1, 1, 1.5)).translate(tuple(c))
+
+        def ecorcer(v, c=c):                                   # même écorce que le tronc
+            n = v - c
+            n /= np.linalg.norm(n, axis=1, keepdims=True)
+            return v + n * (0.6 * ecorce(v))[:, None]
+
+        plus.append((z, bosse.refine_to_length(0.8).warp_batch(ecorcer)))
         trou = Manifold.sphere(r * 0.7, 48).scale((1, 1, 1.6))
         moins.append((z, placer(trou, p + out * 0.8 * r * 0.4, out)))
     return plus, moins
@@ -322,6 +335,43 @@ def chicots():
         p, out = point_exterieur(k, z)
         res.append((z, *chicot(g, p - out * 1.5, out)))
     return res
+
+
+def plaque_soulevee(g, z, k):
+    """Lambeau d'écorce collé en bas, décollé et déchiqueté en haut."""
+    H, ouv = g.uniform(40, 75), g.uniform(0.45, 0.85)
+    r_in, ep = float(rayon_brin(k, z)) - 2.5, 1.8
+    axe = axe_brin(k, np.array([z - 1.0, z, z + 1.0]))
+    d = axe[2] - axe[0]
+    d /= np.linalg.norm(d)
+    u = np.cross(d, [0, 0, 1.0]); u /= np.linalg.norm(u)
+    v = np.cross(d, u)
+    cx, cy = centre_coeur(z)
+    out = np.array([axe[1][0] - cx, axe[1][1] - cy, 0.0])
+    al = math.atan2(out @ v, out @ u)                          # direction extérieure, repère local
+    coque = (Manifold.cylinder(H, r_in + ep, r_in + ep, 180)
+             - Manifold.cylinder(H + 2, r_in, r_in, 180).translate((0, 0, -1)))
+    coque = coque.trim_by_plane((-math.sin(al - ouv), math.cos(al - ouv), 0), 0)
+    coque = coque.trim_by_plane((math.sin(al + ouv), -math.cos(al + ouv), 0), 0)
+    phase = g.uniform(0, 6.3)
+
+    def deformer(pts):
+        x, y, zz = pts[:, 0], pts[:, 1], pts[:, 2]
+        a, r = np.arctan2(y, x), np.hypot(x, y)
+        t = np.clip(zz / H, 0, 1)
+        da = np.angle(np.exp(1j * (a - al))) / ouv
+        q = np.stack([r_in * np.cos(a) + 37 * k, r_in * np.sin(a), zz + z], -1)
+        r = r + 4.5 * t ** 1.6 + 2.5 * t * da ** 4 + 0.5 * ecorce(q)       # se décolle, bords roulés
+        zz = zz - 6 * t ** 6 * np.abs(np.sin(9 * da + phase))              # haut déchiqueté
+        return np.stack([r * np.cos(a), r * np.sin(a), zz], -1)
+
+    coque = coque.refine_to_length(1.2).warp_batch(deformer)
+    return coque.transform(np.column_stack([u, v, d, axe[1]]))
+
+
+def plaques_soulevees():
+    g = np.random.default_rng(GRAINE + 8)
+    return [(z, plaque_soulevee(g, z, k)) for z, k in emplacements(NB_PLAQUES, 10, 85, GRAINE + 9)]
 
 
 def veine() -> Manifold:
@@ -368,9 +418,9 @@ def grappe(o) -> Manifold:
 # ---------------------------------------------------------------- PIÈCES
 def avec_details(bois, z0, z1, details):
     """Ajoute bosses et chicots, creuse les nœuds ; renvoie (bois, bois clair)."""
-    plus, moins, ch = details
+    plus, moins, ch, lambeaux = details
     sel = lambda lst: [m for z, m in lst if z0 <= z < z1]
-    bois = union([bois] + sel(plus) + [e for z, e, _ in ch if z0 <= z < z1])
+    bois = union([bois] + sel(plus) + sel(lambeaux) + [e for z, e, _ in ch if z0 <= z < z1])
     for m in sel(moins):
         bois = bois - m
     clair = [c for z, _, c in ch if z0 <= z < z1]
@@ -410,36 +460,79 @@ def col(filon, details):
     return bois - filon, v, clair
 
 
+def coudes(g, n, amp):
+    """Bruit par morceaux : donne au bois des coudes au lieu de courbes trop lisses."""
+    cles = np.linspace(0, 1, 7)
+    s = np.linspace(0, 1, n)
+    dev = np.stack([np.interp(s, cles, g.uniform(-1, 1, 7)) for _ in range(3)], -1)
+    noyau = np.ones(9) / 9
+    dev = np.stack([np.convolve(dev[:, i], noyau, mode="same") for i in range(3)], -1)
+    return dev * amp * s[:, None]
+
+
+def branche(g, pts, r0, r1, aplat=0.8):
+    s = np.linspace(0, 1, len(pts))
+    r = r0 * (1 - s) ** 0.75 + r1
+    for pos in g.uniform(0.2, 0.85, 3):                                   # nœuds
+        r = r + 0.25 * r0 * np.exp(-((s - pos) / 0.035) ** 2) * (1 - 0.6 * s)
+    return tube_balaye(pts, r, n=96, texture=np.clip(r / 9, 0.15, 1), aplat=aplat), r
+
+
+def griffe(g, cx, cy, a0, e0, z0, L, ecarte, crochet, vrille):
+    n = int(L / PAS)
+    s = np.linspace(0, 1, n)
+    rad = e0 + ecarte * np.sin(math.pi * s * 0.7) - crochet * s ** 3
+    z = z0 + L * 0.8 * (s - 0.25 * s ** 3)
+    tw = a0 + vrille * s
+    pts = np.stack([cx + rad * np.cos(tw), cy + rad * np.sin(tw), z], -1)
+    return pts + coudes(g, n, 9.0)
+
+
+def rameau(g, pts, r, s0):
+    """Petite branche qui part d'une griffe et se recourbe."""
+    i = int(s0 * len(pts))
+    t = pts[min(i + 1, len(pts) - 1)] - pts[i - 1]
+    t /= np.linalg.norm(t)
+    lat = np.cross(t, g.normal(size=3))
+    lat /= np.linalg.norm(lat)
+    L = g.uniform(40, 80)
+    n = int(L / PAS)
+    s = np.linspace(0, 1, n)[:, None]
+    d0 = 0.5 * t + 0.85 * lat
+    chemin = pts[i] + L * (s * d0 + 0.6 * s ** 2 * (t - 0.4 * lat)) + coudes(g, n, 5.0)
+    return branche(g, chemin, 0.5 * r[i], 1.1)[0]
+
+
 def main_griffue():
-    """Les 3 brins s'ouvrent en 6 griffes, plus longues et crochues à l'arrière."""
+    """Le bois du tronc se prolonge en 3 grosses griffes coudées, crochues à l'arrière,
+    avec des rameaux ; 6 racines plus fines enveloppent la base et montent entre les cristaux."""
     cx, cy = (float(v) for v in centre_coeur(Z_COL1))
     zs = np.linspace(Z_COL1, Z_COL1 + HP, int(HP / PAS) + 1)
     th = np.linspace(0, 2 * math.pi, 240, endpoint=False)
     Z, TH = np.meshgrid(zs, th, indexing="ij")
-    R = rayon_coeur(Z_COL1) + 3.0 * ((Z - Z_COL1) / HP) ** 1.5
+    R = rayon_coeur(Z_COL1) - 1 + 0 * Z
     paume = loft(texturer(np.stack([cx + R * np.cos(TH), cy + R * np.sin(TH), Z], -1)))
 
     g = np.random.default_rng(GRAINE + 3)
     dos = math.atan2(-cy, -cx) if abs(cx) + abs(cy) > 1 else 0.0       # côté opposé à la pente
-    griffes = []
-    for k in range(3):
+    bois = [paume]
+    e0 = float(ecart_brins(Z_COL1))
+    for k in range(3):                                                  # grosses griffes
         a0 = float(angle_brin(k, Z_COL1))
-        e0 = float(ecart_brins(Z_COL1))
-        for sens in (-1, 1):
-            a = a0 + sens * 0.33
-            arriere = max(0.0, math.cos(a - dos))
-            L = 240 + 100 * arriere + g.uniform(-15, 15)
-            s = np.linspace(0, 1, int(L / PAS))
-            rad = e0 + 4 + g.uniform(28, 38) * np.sin(math.pi * s * 0.7) - (15 + 35 * arriere) * s ** 3
-            z = Z_COL1 - 15 + L * 0.8 * (s - 0.25 * s ** 3)
-            tw = a + (0.5 + 0.3 * g.uniform()) * s * (1 if k % 2 else -1) + sens * 0.15 * s
-            pts = np.stack([cx + rad * np.cos(tw), cy + rad * np.sin(tw), z], -1)
-            r = (RAYON_BRIN + 1.5) * (1 - s) ** 0.8 + 2.2
-            for pos in (0.32, 0.58, 0.8):                                       # jointures
-                r = r + 2.5 * np.exp(-((s - pos) / 0.04) ** 2) * (1 - 0.6 * s)
-            griffes.append(tube_balaye(pts, r, n=96, texture=np.clip(r / 10, 0.2, 1)))
+        arr = max(0.0, math.cos(a0 - dos))
+        pts = griffe(g, cx, cy, a0, e0, Z_COL1 - 20, 250 + 110 * arr + g.uniform(-15, 15),
+                     g.uniform(22, 32), 20 + 45 * arr, g.uniform(0.4, 0.8) * (1 if k % 2 else -1))
+        tube, r = branche(g, pts, RAYON_BRIN + 3, 2.0, aplat=0.75)
+        bois.append(tube)
+        for s0 in g.uniform(0.35, 0.65, 1 + int(arr > 0.3)):
+            bois.append(rameau(g, pts, r, s0))
+    for k in range(6):                                                  # racines qui enveloppent
+        a0 = float(angle_brin(0, Z_COL1)) + math.pi / 3 * (k + 0.5) + g.uniform(-0.2, 0.2)
+        pts = griffe(g, cx, cy, a0, float(R[0, 0]) + 1, Z_COL1 - 10, g.uniform(150, 220),
+                     g.uniform(10, 20), g.uniform(5, 15), g.uniform(-0.9, 0.9))
+        bois.append(branche(g, pts, g.uniform(7, 10), 1.4, aplat=0.7)[0])
 
-    main = union([paume] + griffes) ^ tranche(Z_COL1, Z_COL1 + 500)
+    main = union(bois) ^ tranche(Z_COL1, Z_COL1 + 500)
     main = main - cylindre(R_TENON + JEU / 2, H_TENON, Z_COL1 - 1, cx, cy)        # mortaise
     main = main - cylindre(DIAM_LED / 2, HP + 1, Z_COL1, cx, cy)                  # chambre de lumière
     main = main - trous_goupilles()
@@ -469,7 +562,7 @@ if __name__ == "__main__":
     for f in (SORTIE / "stl").glob("*.stl"):
         f.unlink()
     filon = veine()
-    details = (*noeuds_creux(), chicots())
+    details = (*noeuds_creux(), chicots(), plaques_soulevees())
     rendu = {"bois": [], "veine": [], "cristaux": [], "clair": []}
     for i in range(NB_SEGMENTS):
         bois, v, clair = segment_fut(i, filon, details)

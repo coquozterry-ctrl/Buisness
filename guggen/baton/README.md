@@ -1,9 +1,10 @@
 # Bâton de la Guggen
 
 Bâton d'environ **1,95 m** façon tronc d'arbre tordu d'Halloween : trois brins de bois
-enroulés, nœuds creux, bosses, branches cassées, une veine dorée au fond d'un sillon.
-En haut, le col se cambre en S et les brins s'ouvrent en griffes qui enserrent des cristaux
-éclairés par une bougie LED orange.
+enroulés, écorce épaisse aux sillons profonds, lambeaux d'écorce soulevés, nœuds creux,
+branches cassées, une veine dorée au fond d'un sillon. En haut, le col se cambre en S et le
+bois se prolonge en grosses griffes coudées, avec des rameaux et des racines qui enveloppent
+des cristaux éclairés par une bougie LED orange.
 Conçu pour une **Prusa XL multi-têtes** (plateau 360 × 360 × 360 mm).
 
 | Tête | Écorce | Bâton complet |
@@ -17,8 +18,14 @@ Conçu pour une **Prusa XL multi-têtes** (plateau 360 × 360 × 360 mm).
   casserait au premier choc.
 - Autour du tube, un cœur (paroi d'au moins 3,5 mm, vérifiée par le script) et trois brins
   qui s'enroulent d'un tour tous les 33 cm, avec un pied évasé comme des racines.
-- La texture d'écorce (sillons verticaux et gerçures) est continue d'un tronçon à l'autre.
+- L'écorce est en vrai relief : plaques qui ressortent de 1 à 2 mm, sillons de près de 4 mm,
+  cassures en travers et gerçures fines. Elle est continue d'un tronçon à l'autre.
+- **12 lambeaux d'écorce soulevés** : collés en bas, décollés de 4 à 5 mm et déchiquetés en haut.
+  Ils montent en s'écartant légèrement, donc s'impriment sans support.
 - **9 nœuds creux** et **9 branches cassées** répartis sur la hauteur, loin des jointures.
+- En haut, pas de « coupe » : 3 grosses griffes (la suite des 3 brins), coudées et à section
+  aplatie comme du vrai bois, crochues à l'arrière, avec des rameaux ; 6 racines plus fines
+  enveloppent la base et montent entre les cristaux.
   Elles pointent vers le haut (42 à 60°) pour s'imprimer sans support. Le bout éclaté
   (bois clair et échardes) est une pièce séparée, à imprimer dans une 4e couleur.
 - La **veine dorée** est une pièce séparée, logée au fond du sillon entre deux brins : à imprimer
@@ -41,8 +48,8 @@ Chaque pièce multi-couleur = plusieurs STL à charger **ensemble** dans PrusaSl
 | Pièce | Fichiers | Taille (mm) | Outils |
 |---|---|---|---|
 | Fût 1 à 4 (1 = pied) | `fut_N_ecorce.stl` + `fut_N_veine.stl` (+ `fut_N_bois_clair.stl`) | ~75-100 × 75 × 350 | T1, T2, T4 |
-| Col en S | `tete_1_col_ecorce.stl` + `tete_1_col_veine.stl` + `tete_1_col_bois_clair.stl` | ~103 × 104 × 325 | T1, T2, T4 |
-| Griffes + cristaux | `tete_2_main_ecorce.stl` + `tete_2_main_cristaux.stl` | ~143 × 136 × 195 | T1, T3 translucide |
+| Col en S | `tete_1_col_ecorce.stl` + `tete_1_col_veine.stl` + `tete_1_col_bois_clair.stl` | ~119 × 118 × 325 | T1, T2, T4 |
+| Griffes + cristaux | `tete_2_main_ecorce.stl` + `tete_2_main_cristaux.stl` | ~118 × 138 × 190 | T1, T3 translucide |
 
 Le tronçon 2 n'a pas de branche cassée : pas de fichier `bois_clair` pour lui.
 
@@ -61,7 +68,8 @@ chaque partie. Les fichiers partagent la même origine : rien à aligner.
 ## Impression
 
 - Fût et col : debout, 3 parois, 10 % de remplissage gyroïde, sans support.
-  Buse 0,4 mm, couches 0,2 mm (0,15 mm pour une écorce plus fine).
+  Buse 0,4 mm, couches 0,15 à 0,2 mm. Les lambeaux soulevés font 1,8 mm d'épaisseur :
+  garder 2 parois minimum pour qu'ils soient pleins.
 - Col : debout, supports organiques sous le ventre du S.
 - Griffes : debout, **supports organiques** sous les griffes.
 - Cristaux : réglage de pièce dans PrusaSlicer, 2 parois et 0 % de remplissage pour qu'ils
