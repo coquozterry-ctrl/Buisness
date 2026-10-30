@@ -1,10 +1,11 @@
-"""Génère le bâton de la Guggen en pièces imprimables (STL).
+"""Génère le bâton de la Guggen en pièces imprimables multi-matériaux (Prusa XL).
 
-Principe : un tube alu Ø16 mm sert d'âme (solidité), les pièces imprimées s'enfilent
-dessus et forment l'écorce tordue. En haut, une main griffue tient des cristaux
-translucides ; sous les cristaux, une cavité accueille une bougie LED.
+Principe : un tube alu Ø16 mm sert d'âme (solidité), les tronçons imprimés s'enfilent
+dessus et forment l'écorce calcinée. Une veine dorée court dans un sillon de l'écorce
+(2e couleur). En haut, une main noueuse enserre des cristaux translucides imprimés
+dans la même pièce (3e couleur). La main s'emboîte sur le col, qui cache une bougie LED.
 
-Usage : python3 generer_baton.py   (écrit les STL dans ./stl et des aperçus dans ./apercu)
+Usage : python3 generer_baton.py   (écrit les STL dans ./stl)
 Toutes les cotes sont en mm et se règlent dans le bloc PARAMÈTRES.
 """
 
@@ -14,27 +15,33 @@ from pathlib import Path
 import numpy as np
 import trimesh
 from manifold3d import Manifold, Mesh
+from scipy.spatial import cKDTree
 
 # ---------------------------------------------------------------- PARAMÈTRES
 LONGUEUR_FUT = 1400        # longueur de la partie tube (sans la tête)
-NB_SEGMENTS = 7            # 7 x 200 mm : tient dans un plateau de 220 x 220 x 250
+NB_SEGMENTS = 4            # 4 x 350 mm : plateau Prusa XL 360 x 360 x 360
 DIAM_TUBE = 16.0           # tube alu (ou fibre de verre) Ø16 mm
 JEU = 0.4                  # jeu pour enfiler les pièces sur le tube
-RAYON_FUT = 21.0           # rayon moyen du fût (≈ Ø42-50 mm avec les reliefs)
-PROF_DOUILLE = 120         # profondeur du tube dans le col de la tête
-DIAM_LED = 42.0            # cavité pour bougie LED (Ø38 mm, format chauffe-plat)
-PROF_LED = 58.0
+RAYON_FUT = 23.0           # rayon moyen du fût (≈ Ø46-56 mm avec les reliefs)
+ONDULATION = 6.0           # amplitude des ondulations du fût
+PAROI_MIN = 3.5            # paroi minimale autour du tube, sous les fissures
+PROF_DOUILLE = 120         # profondeur du tube dans le col
+DIAM_LED = 42.0            # bougie LED « chauffe-plat » Ø38 mm
 GRAINE = 7                 # change la graine pour un autre bâton "unique"
 
-PAS_Z = 2.0                # résolution verticale
-N_THETA = 96               # résolution autour
+PAS = 0.7                  # finesse du maillage (taille des fissures ≈ 2 mm)
 SORTIE = Path(__file__).parent
 
+R_ALESAGE = DIAM_TUBE / 2 + JEU / 2
+Z_COL0 = LONGUEUR_FUT
+Z_COL1 = LONGUEUR_FUT + 250
+R_TENON, H_TENON = 24.0, 25.0      # emboîtement main / col (contient la bougie)
+HP = 75.0                          # hauteur de la paume
+
 rng = np.random.default_rng(GRAINE)
-# noeuds / bosses répartis sur le fût : (z, angle, hauteur, largeur_z, largeur_angle)
-NOEUDS = [(rng.uniform(80, LONGUEUR_FUT + 120), rng.uniform(0, 2 * math.pi),
+NOEUDS = [(rng.uniform(80, Z_COL1), rng.uniform(0, 2 * math.pi),
            rng.uniform(2.5, 5.0), rng.uniform(15, 35), rng.uniform(0.35, 0.7))
-          for _ in range(18)]
+          for _ in range(22)]
 
 
 # ---------------------------------------------------------------- OUTILS MAILLAGE
@@ -50,214 +57,302 @@ def vers_trimesh(man: Manifold) -> trimesh.Trimesh:
     return trimesh.Trimesh(mm.vert_properties[:, :3], mm.tri_verts, process=True)
 
 
-def loft(anneaux: np.ndarray) -> trimesh.Trimesh:
+def loft(anneaux: np.ndarray) -> Manifold:
     """anneaux : (n_z, n_theta, 3) -> solide fermé (bouchons en éventail au centre)."""
     nz, nt, _ = anneaux.shape
-    v = anneaux.reshape(-1, 3)
-    f = []
-    for i in range(nz - 1):
-        for j in range(nt):
-            a, b = i * nt + j, i * nt + (j + 1) % nt
-            c, d = a + nt, b + nt
-            f += [(a, b, d), (a, d, c)]
-    bas = anneaux[0].mean(0)
-    haut = anneaux[-1].mean(0)
-    ib, ih = len(v), len(v) + 1
-    v = np.vstack([v, bas, haut])
+    i, j = np.meshgrid(np.arange(nz - 1), np.arange(nt), indexing="ij")
+    a = (i * nt + j).ravel()
+    b = (i * nt + (j + 1) % nt).ravel()
+    c, d = a + nt, b + nt
+    f = [np.stack([a, b, d], 1), np.stack([a, d, c], 1)]
+    ib, ih = nz * nt, nz * nt + 1
+    j = np.arange(nt)
     top = (nz - 1) * nt
-    for j in range(nt):
-        f.append((ib, (j + 1) % nt, j))
-        f.append((ih, top + j, top + (j + 1) % nt))
-    return trimesh.Trimesh(v, np.array(f), process=True)
+    f.append(np.stack([np.full(nt, ib), (j + 1) % nt, j], 1))
+    f.append(np.stack([np.full(nt, ih), top + j, top + (j + 1) % nt], 1))
+    v = np.vstack([anneaux.reshape(-1, 3), anneaux[0].mean(0), anneaux[-1].mean(0)])
+    return vers_manifold(trimesh.Trimesh(v, np.vstack(f), process=False))
 
 
-def cylindre(r, h, z0=0.0, x=0.0, y=0.0, n=64) -> Manifold:
+def normales(anneaux):
+    """Normales sortantes d'une grille (n_z, n_theta, 3)."""
+    dt = np.roll(anneaux, -1, 1) - np.roll(anneaux, 1, 1)
+    dz = np.gradient(anneaux, axis=0)
+    n = np.cross(dt, dz)
+    return n / np.maximum(np.linalg.norm(n, axis=-1, keepdims=True), 1e-9)
+
+
+def cylindre(r, h, z0=0.0, x=0.0, y=0.0, n=96) -> Manifold:
     return Manifold.cylinder(h, r, r, n).translate((x, y, z0))
 
 
-# ---------------------------------------------------------------- ÉCORCE
+def union(pieces):
+    tout = pieces[0]
+    for p in pieces[1:]:
+        tout = tout + p
+    return tout
+
+
+# ---------------------------------------------------------------- TEXTURE D'ÉCORCE
+class Cellules:
+    """Bruit cellulaire 3D (Worley) : plaques d'écorce calcinée séparées par des fissures."""
+
+    def __init__(self, taille, etirement, graine):
+        g = np.random.default_rng(graine)
+        self.S = np.array([1.0, 1.0, 1.0 / etirement])
+        lo = np.array([-200, -200, -50]) * self.S
+        hi = np.array([250, 250, Z_COL1 + 450]) * self.S
+        axes = [np.arange(l, h, taille) for l, h in zip(lo, hi)]
+        base = np.stack(np.meshgrid(*axes, indexing="ij"), -1).reshape(-1, 3)
+        pts = base + g.uniform(0, taille, base.shape)
+        self.arbre = cKDTree(pts)
+        self.h = g.uniform(-1, 1, len(pts))
+
+    def __call__(self, p):
+        d, i = self.arbre.query(p.reshape(-1, 3) * self.S, k=2, workers=-1)
+        return (d[:, 1] - d[:, 0]).reshape(p.shape[:-1]), self.h[i[:, 0]].reshape(p.shape[:-1])
+
+
+PLAQUES = Cellules(9.0, 2.6, GRAINE)
+GERCURES = Cellules(3.0, 1.8, GRAINE + 1)
+PROF_ECORCE = 3.0
+
+
+def ecorce(p):
+    """Déplacement (mm, négatif = vers l'intérieur) de l'écorce au point p."""
+    e1, h1 = PLAQUES(p)
+    e2, _ = GERCURES(p)
+    fissure = np.clip(1 - e1 / 2.0, 0, 1) ** 1.3
+    gercure = np.clip(1 - e2 / 0.7, 0, 1)
+    fibres = np.sin(p[..., 2] * 0.9 + 3 * np.sin(p[..., 0] * 0.21) + 3 * np.sin(p[..., 1] * 0.19))
+    return -2.2 * fissure + 0.45 * h1 * (1 - fissure) - 0.5 * gercure + 0.15 * fibres
+
+
+def texturer(anneaux, echelle=1.0):
+    d = ecorce(anneaux) * np.broadcast_to(echelle, anneaux.shape[:-1])
+    return anneaux + normales(anneaux) * d[..., None]
+
+
+# ---------------------------------------------------------------- FORME DU BOIS
+def torsion(z):
+    return 2 * math.pi * z / 330.0 + 0.6 * np.sin(z / 210.0)
+
+
 def centre(z):
-    """Ligne moyenne : droite le long du tube, puis le col se cambre en S."""
-    z0 = LONGUEUR_FUT + PROF_DOUILLE - 20
-    t = np.clip((z - z0) / 260.0, 0, 1)
-    x = 38 * np.sin(math.pi * t) * t
-    y = -12 * np.sin(2 * math.pi * t)
-    return x, y
-
-
-def rayon_base(z):
-    r = RAYON_FUT + 1.5 * np.sin(z / 170.0) + 0.8 * np.sin(z / 53.0 + 1)
-    r = r - 2.0 * np.exp(-z / 60.0)                              # pied un peu affiné
-    h = LONGUEUR_FUT
-    r = r + 9.0 * np.clip((z - h) / 220.0, 0, 1) ** 1.5           # le col s'élargit vers la main
-    return r
+    """Ligne moyenne : ondulée le long du tube, puis le col se cambre en S."""
+    x = ONDULATION * (np.sin(2 * math.pi * z / 520 + 0.4) + 0.5 * np.sin(2 * math.pi * z / 230 + 1.7))
+    y = ONDULATION * (0.8 * np.sin(2 * math.pi * z / 610 + 2.1) + 0.4 * np.sin(2 * math.pi * z / 270))
+    z0 = Z_COL0 + PROF_DOUILLE + 5
+    t = np.clip((z - z0) / (Z_COL1 - z0), 0, 1)
+    fin = np.where(z > z0, np.clip((Z_COL1 - z) / 60, 0, 1), 1)  # ondulation éteinte en haut
+    return x * fin + 38 * np.sin(math.pi * t) * t, y * fin - 12 * np.sin(2 * math.pi * t)
 
 
 def rayon(z, th):
-    """Rayon de l'écorce : 3 brins tordus + noeuds + fissures."""
-    torsion = 2 * math.pi * z / 340.0 + 0.6 * np.sin(z / 210.0)
-    r = rayon_base(z)
-    r = r + 4.5 * np.cos(3 * th - torsion)                        # brins enroulés
-    r = r + 1.0 * np.cos(5 * th + 0.7 * torsion + 1.3)
+    r = RAYON_FUT + 1.5 * np.sin(z / 170.0) + 0.8 * np.sin(z / 53.0 + 1)
+    r = r - 2.0 * np.exp(-z / 60.0)                               # pied un peu affiné
+    r = r + 9.0 * np.clip((z - Z_COL0) / (Z_COL1 - Z_COL0), 0, 1) ** 1.5      # le col s'élargit
+    tw = torsion(z)
+    r = r + 4.5 * np.cos(3 * th - tw)                             # 3 brins enroulés
+    r = r + 1.2 * np.cos(5 * th + 0.7 * tw + 1.3)
     for (zn, an, hn, wz, wa) in NOEUDS:
         da = np.angle(np.exp(1j * (th - an)))
         r = r + hn * np.exp(-((z - zn) / wz) ** 2 - (da / wa) ** 2)
-    fissure = np.abs(np.sin(11 * th - 0.25 * torsion + 0.8 * np.sin(z / 23.0)))
-    r = r - 0.9 * (fissure < 0.18)                                # fissures d'écorce
-    r = r + 0.35 * np.sin(29 * th + z / 7.0) * np.sin(z / 11.0)   # grain fin
     return r
 
 
-def anneaux_ecorce(z0, z1):
-    zs = np.arange(z0, z1 + 1e-6, PAS_Z)
-    th = np.linspace(0, 2 * math.pi, N_THETA, endpoint=False)
+def points_bois(z, th):
+    """Surface lisse du bois, repoussée pour garder la paroi autour du tube droit."""
+    r = rayon(z, th)
+    cx, cy = centre(z)
+    x, y = cx + r * np.cos(th), cy + r * np.sin(th)
+    rmin = R_ALESAGE + PAROI_MIN + PROF_ECORCE
+    d = np.hypot(x, y)
+    k = 2.0
+    d2 = np.where(z < Z_COL0 + PROF_DOUILLE + 15, k * np.logaddexp(d / k, rmin / k), d)  # max doux
+    f = d2 / np.maximum(d, 1e-9)
+    return np.stack([x * f, y * f, z], -1)
+
+
+def surface_bois(z0, z1):
+    zs = np.linspace(z0, z1, int(round((z1 - z0) / PAS)) + 1)
+    th = np.linspace(0, 2 * math.pi, 288, endpoint=False)
     Z, TH = np.meshgrid(zs, th, indexing="ij")
-    R = rayon(Z, TH)
-    cx, cy = centre(Z)
-    return np.stack([cx + R * np.cos(TH), cy + R * np.sin(TH), Z], -1)
+    s = texturer(points_bois(Z, TH))
+    s[..., 2] = np.where(np.isin(Z, (z0, z1)), Z, s[..., 2])     # tranches bien planes
+    return s
 
 
-def ecorce(z0, z1) -> Manifold:
-    return vers_manifold(loft(anneaux_ecorce(z0, z1)))
-
-
-# ---------------------------------------------------------------- PIÈCES
-def segment_fut(i) -> Manifold:
-    h = LONGUEUR_FUT / NB_SEGMENTS
-    z0, z1 = i * h, (i + 1) * h
-    s = ecorce(z0, z1) - cylindre(DIAM_TUBE / 2 + JEU / 2, h + 2, z0 - 1)
-    return s.translate((0, 0, -z0))
-
-
-Z_COL0 = LONGUEUR_FUT
-Z_COL1 = LONGUEUR_FUT + 230
-TENON_R, TENON_H = 11.0, 12.0
-
-
-def col() -> Manifold:
-    s = ecorce(Z_COL0, Z_COL1)
-    s = s - cylindre(DIAM_TUBE / 2 + JEU / 2, PROF_DOUILLE, Z_COL0 - 1)   # douille borgne
-    cx, cy = centre(Z_COL1)
-    s = s + cylindre(TENON_R, TENON_H, Z_COL1 - 1, cx, cy)               # tenon vers la main
-    return s.translate((0, 0, -Z_COL0))
-
-
-def tube_balaye(pts, rayons, n=24) -> Manifold:
+def tube_balaye(pts, rayons, n=24, texture=None):
     """Tube le long d'une courbe 3D (repère par transport parallèle)."""
     pts = np.asarray(pts, float)
     tang = np.gradient(pts, axis=0)
     tang /= np.linalg.norm(tang, axis=1)[:, None]
     nrm = np.cross(tang[0], [0, 0, 1.0] if abs(tang[0][2]) < 0.9 else [1.0, 0, 0])
     nrm /= np.linalg.norm(nrm)
-    anneaux = []
     th = np.linspace(0, 2 * math.pi, n, endpoint=False)
-    for k, (p, t) in enumerate(zip(pts, tang)):
+    anneaux = []
+    for p, t, r in zip(pts, tang, rayons):
         nrm = nrm - np.dot(nrm, t) * t
         nrm /= np.linalg.norm(nrm)
         b = np.cross(t, nrm)
-        anneaux.append(p + rayons[k] * (np.outer(np.cos(th), nrm) + np.outer(np.sin(th), b)))
-    return vers_manifold(loft(np.array(anneaux)))
+        anneaux.append(p + r * (np.outer(np.cos(th), nrm) + np.outer(np.sin(th), b)))
+    anneaux = np.array(anneaux)
+    if texture is not None:
+        anneaux = texturer(anneaux, texture[:, None] * np.ones(n))
+    return loft(anneaux)
+
+
+# ---------------------------------------------------------------- VEINE DORÉE
+def veine() -> Manifold:
+    """Filon doré logé dans le creux entre deux brins, qui affleure puis replonge."""
+    z = np.arange(25, Z_COL1 - 25, 1.0)
+    th = (math.pi + torsion(z)) / 3 + 0.15 * np.sin(z / 47)
+    surf = points_bois(z, th)
+    cx, cy = centre(z)
+    rv = 4.2 + 1.2 * np.sin(z / 61 + 1) + 0.6 * np.sin(z / 23)
+    enfonce = rv - 0.6 + 3.0 * np.clip(np.sin(z / 150 + 0.5), 0, 1) ** 3  # affleure, replonge par endroits
+    rv = rv * np.clip(np.minimum(z - 25, Z_COL1 - 25 - z) / 40, 0.15, 1)
+    ax = np.stack([surf[:, 0] - cx, surf[:, 1] - cy], -1)
+    ax /= np.linalg.norm(ax, axis=1)[:, None]
+    p = surf.copy()
+    p[:, :2] -= ax * enfonce[:, None]
+    d = np.hypot(p[:, 0], p[:, 1])                                       # paroi min. autour du tube
+    dmin = np.where(z < Z_COL0 + PROF_DOUILLE + 10, R_ALESAGE + 2.0 + rv, 0)
+    p[:, :2] *= (np.maximum(d, dmin) / np.maximum(d, 1e-9))[:, None]
+    return tube_balaye(p, rv, n=20)
+
+
+# ---------------------------------------------------------------- CRISTAUX
+def cristal(g, r, h, inclin, azim, base):
+    """Prisme hexagonal irrégulier à terminaison asymétrique (enveloppe convexe)."""
+    a = np.arange(6) * math.pi / 3 + g.uniform(-0.12, 0.12, 6)
+    rr = r * g.uniform(0.8, 1.15, 6)
+    bas = np.stack([rr * np.cos(a), rr * np.sin(a), np.full(6, -8.0)], 1)
+    hh = h * (1 + g.uniform(-0.12, 0.05, 6))
+    haut = np.stack([rr * np.cos(a) * 0.97, rr * np.sin(a) * 0.97, hh], 1)
+    pointe = [[g.uniform(-0.3, 0.3) * r, g.uniform(-0.3, 0.3) * r, h + r * g.uniform(1.3, 2.2)]]
+    c = Manifold.hull_points(np.vstack([bas, haut, pointe]))
+    return c.rotate((inclin, 0, 0)).rotate((0, 0, azim)).translate(tuple(base))
+
+
+def grappe(o) -> Manifold:
+    g = np.random.default_rng(GRAINE + 2)
+    pieces = [cylindre(27, 6, o[2] - 4, o[0], o[1]),                    # socle, laisse passer la lumière
+              cristal(g, 16, 125, 4, 30, o)]
+    for k in range(9):
+        a = 2 * math.pi * k / 9 + g.uniform(-0.25, 0.25)
+        d = g.uniform(9, 17)
+        pieces.append(cristal(g, g.uniform(6, 11), g.uniform(35, 90), g.uniform(12, 32),
+                              math.degrees(a) + 90, o + [d * math.cos(a), d * math.sin(a), 0]))
+    for k in range(40):                                                 # druse au pied
+        a = g.uniform(0, 2 * math.pi)
+        d = g.uniform(14, 26)
+        pieces.append(cristal(g, g.uniform(1.3, 3.0), g.uniform(3, 10), g.uniform(10, 50),
+                              math.degrees(a) + 90, o + [d * math.cos(a), d * math.sin(a), 1.5]))
+    return union(pieces)
+
+
+# ---------------------------------------------------------------- PIÈCES
+def segment_fut(i, filon):
+    h = LONGUEUR_FUT / NB_SEGMENTS
+    z0 = i * h
+    alesage = cylindre(R_ALESAGE, h + 2, z0 - 1)
+    bois = loft(surface_bois(z0, z0 + h)) - alesage
+    return bois - filon, (filon ^ bois.hull()) - alesage
+
+
+def trous_goupilles():
+    """2 trous Ø3,2 pour goupiller la main sur le col (clous ou vis M3)."""
+    cx, cy = centre(Z_COL1)
+    trous = []
+    for a in (20, 200):
+        c = Manifold.cylinder(30, 1.6, 1.6, 24).rotate((0, 90, 0)).translate((R_TENON - 10, 0, 0))
+        trous.append(c.rotate((0, 0, a)).translate((cx, cy, Z_COL1 + H_TENON / 2)))
+    return trous[0] + trous[1]
+
+
+def col(filon):
+    cx, cy = centre(Z_COL1)
+    bois = loft(surface_bois(Z_COL0, Z_COL1))
+    bois = bois - cylindre(R_ALESAGE, PROF_DOUILLE + 1, Z_COL0 - 1)               # douille
+    bois = bois + cylindre(R_TENON, H_TENON + 1, Z_COL1 - 1, cx, cy)              # tenon
+    bois = bois - cylindre(DIAM_LED / 2, 23, Z_COL1 + H_TENON - 22, cx, cy)       # logement bougie
+    bois = bois - trous_goupilles()
+    return bois - filon, (filon ^ bois.hull()) - cylindre(R_ALESAGE, PROF_DOUILLE + 1, Z_COL0 - 1)
 
 
 def main_griffue():
-    """Paume creuse (cavité LED) + 5 doigts noueux qui enserrent les cristaux."""
-    hp = 80.0                                            # hauteur de la paume
-    zs = np.arange(0, hp + 1e-6, PAS_Z)
-    th = np.linspace(0, 2 * math.pi, N_THETA, endpoint=False)
+    """Paume noueuse + 6 doigts écorcés qui enserrent la grappe de cristaux."""
+    cx, cy = centre(Z_COL1)
+    zs = np.linspace(Z_COL1, Z_COL1 + HP, int(HP / PAS) + 1)
+    th = np.linspace(0, 2 * math.pi, 320, endpoint=False)
     Z, TH = np.meshgrid(zs, th, indexing="ij")
-    R = rayon(Z + Z_COL1, TH) + 10.0 * (Z / hp) ** 1.5    # l'écorce du col s'évase en paume
-    paume = vers_manifold(loft(np.stack([R * np.cos(TH), R * np.sin(TH), Z], -1)))
+    R = rayon(Z, TH) + 9.0 * ((Z - Z_COL1) / HP) ** 1.5
+    paume = loft(texturer(np.stack([cx + R * np.cos(TH), cy + R * np.sin(TH), Z], -1)))
 
+    g = np.random.default_rng(GRAINE + 3)
     doigts = []
-    rp = float(R[-1].mean()) - 5
-    for k in range(5):
-        a = 2 * math.pi * k / 5 + rng.uniform(-0.2, 0.2)
-        L = rng.uniform(125, 150)
-        s = np.linspace(0, 1, 70)
-        ouv = rng.uniform(20, 26)                         # écartement max
-        rad = rp + ouv * np.sin(math.pi * s * 0.75) - 7 * s ** 6   # bout crochu vers l'intérieur
-        z = hp - 15 + L * s
-        tw = a + 0.3 * s * rng.choice([-1, 1])            # doigts légèrement vrillés
-        pts = np.stack([rad * np.cos(tw), rad * np.sin(tw), z], -1)
-        r = 9.0 * (1 - s) ** 0.7 + 1.5
-        for pos in (0.3, 0.6):                           # jointures
-            r = r + 2.5 * np.exp(-((s - pos) / 0.05) ** 2) * (1 - s)
-        doigts.append(tube_balaye(pts, r))
+    for k in range(6):
+        a = 2 * math.pi * k / 6 + g.uniform(-0.2, 0.2)
+        L = g.uniform(230, 270)
+        s = np.linspace(0, 1, int(L / PAS))
+        rad = 16 + g.uniform(38, 48) * np.sin(math.pi * s * 0.75) - g.uniform(16, 24) * s ** 4
+        z = Z_COL1 + HP * 0.5 + L * 0.8 * (s - 0.2 * s ** 3)
+        tw = a + g.uniform(0.3, 0.6) * s * g.choice([-1, 1])                       # vrillé
+        pts = np.stack([cx + rad * np.cos(tw), cy + rad * np.sin(tw), z], -1)
+        r = 12.0 * (1 - s) ** 0.8 + 2.2
+        for pos in (0.3, 0.55, 0.78):                                               # jointures
+            r = r + 3.0 * np.exp(-((s - pos) / 0.04) ** 2) * (1 - 0.6 * s)
+        doigts.append(tube_balaye(pts, r, n=96, texture=np.clip(r / 10, 0.2, 1)))
 
-    main = paume
-    for d in doigts:
-        main = main + d
-    main = main - cylindre(DIAM_LED / 2, PROF_LED + 200, hp - PROF_LED)  # cavité LED
-    main = main - cylindre(TENON_R + JEU / 2, TENON_H + 1, -1)           # mortaise
-    return main, hp
-
-
-def cristaux():
-    """Bouchon qui s'emboîte dans la cavité + grappe de cristaux (PETG translucide)."""
-    bouchon_r = DIAM_LED / 2 - JEU
-    piece = cylindre(bouchon_r, 12, 0) + cylindre(bouchon_r + 2.5, 3, 12)  # collerette d'appui
-
-    def cristal(r, h, pointe, inclin, azim, dx, dy):
-        prisme = Manifold.cylinder(h, r, r, 6)
-        tete = Manifold.cylinder(pointe + 1, r, 0.0, 6).translate((0, 0, h - 1))
-        c = (prisme + tete).translate((0, 0, -6))
-        c = c.rotate((inclin, 0, 0)).rotate((0, 0, azim)).translate((dx, dy, 15))
-        return c.trim_by_plane((0, 0, 1), 14.0)          # rien sous la collerette
-
-    groupe = [cristal(14, 85, 30, 0, 0, 0, 0)]
-    for k in range(8):
-        a = 360 * k / 8 + rng.uniform(-12, 12)
-        d = rng.uniform(13, 16)
-        groupe.append(cristal(rng.uniform(6, 10), rng.uniform(30, 55), rng.uniform(10, 16),
-                              rng.uniform(10, 25), a + 90,
-                              d * math.cos(math.radians(a)), d * math.sin(math.radians(a))))
-    for c in groupe:
-        piece = piece + c
-    return piece
+    main = union([paume] + doigts)
+    main = main - cylindre(R_TENON + JEU / 2, H_TENON, Z_COL1 - 1, cx, cy)        # mortaise
+    main = main - cylindre(DIAM_LED / 2, HP + 1, Z_COL1, cx, cy)                  # chambre de lumière
+    main = main - trous_goupilles()
+    cr = grappe(np.array([cx, cy, Z_COL1 + HP]))
+    return main - cr, cr
 
 
 # ---------------------------------------------------------------- MAIN
+def exporter(man, nom, z):
+    m = vers_trimesh(man)
+    assert m.is_watertight, f"{nom} : maillage non étanche"
+    m.apply_translation((0, 0, -z))
+    m.export(SORTIE / "stl" / nom)
+    print(f"{nom:26s} {m.extents.round(0)} mm  {m.volume / 1000:5.0f} cm3  {len(m.faces):7d} tri")
+    return m.apply_translation((0, 0, z))
+
+
+def verifier_paroi(bois, z0, z1):
+    anneau = cylindre(R_ALESAGE + PAROI_MIN - 0.5, z1 - z0, z0) - cylindre(R_ALESAGE + 0.01, z1 - z0 + 2, z0 - 1)
+    manque = (anneau - bois).volume()
+    assert manque < 1.0, f"paroi trop fine entre z={z0} et {z1} ({manque:.1f} mm3 manquants)"
+
+
 if __name__ == "__main__":
     (SORTIE / "stl").mkdir(exist_ok=True)
-    (SORTIE / "apercu").mkdir(exist_ok=True)
+    for f in (SORTIE / "stl").glob("*.stl"):
+        f.unlink()
+    filon = veine()
     h = LONGUEUR_FUT / NB_SEGMENTS
-    Zg, Tg = np.meshgrid(np.arange(0, Z_COL0 + PROF_DOUILLE, PAS_Z),
-                         np.linspace(0, 2 * math.pi, N_THETA), indexing="ij")
-    paroi = rayon(Zg, Tg).min() - DIAM_TUBE / 2 - JEU / 2
-    print(f"Paroi minimale autour du tube : {paroi:.1f} mm")
-    assert paroi >= 3.0, "paroi trop fine, augmente RAYON_FUT"
-    assemble = []
-    BOIS, OR = np.array([0.45, 0.33, 0.24]), np.array([0.75, 0.9, 1.0])
-
+    rendu = {"bois": [], "veine": [], "cristaux": []}
     for i in range(NB_SEGMENTS):
-        m = vers_trimesh(segment_fut(i))
-        m.export(SORTIE / "stl" / f"fut_{i + 1:02d}.stl")
-        assemble.append((m.copy().apply_translation((0, 0, i * h)), BOIS))
-        print(f"fut_{i + 1:02d}.stl  {m.extents.round(1)} mm  {m.volume / 1000:.0f} cm3")
+        bois, v = segment_fut(i, filon)
+        verifier_paroi(bois + v, i * h, (i + 1) * h)          # la veine compte dans la paroi
+        rendu["bois"].append(exporter(bois, f"fut_{i + 1}_ecorce.stl", i * h))
+        rendu["veine"].append(exporter(v, f"fut_{i + 1}_veine.stl", i * h))
 
-    m = vers_trimesh(col())
-    m.export(SORTIE / "stl" / "tete_1_col.stl")
-    assemble.append((m.copy().apply_translation((0, 0, Z_COL0)), BOIS))
-    print(f"tete_1_col.stl  {m.extents.round(1)} mm  {m.volume / 1000:.0f} cm3")
+    bois, v = col(filon)
+    verifier_paroi(bois + v, Z_COL0, Z_COL0 + PROF_DOUILLE)
+    rendu["bois"].append(exporter(bois, "tete_1_col_ecorce.stl", Z_COL0))
+    rendu["veine"].append(exporter(v, "tete_1_col_veine.stl", Z_COL0))
 
-    main, hp = main_griffue()
-    m = vers_trimesh(main)
-    m.export(SORTIE / "stl" / "tete_2_main.stl")
-    cx, cy = centre(Z_COL1)
-    assemble.append((m.copy().apply_translation((cx, cy, Z_COL1)), BOIS))
-    print(f"tete_2_main.stl  {m.extents.round(1)} mm  {m.volume / 1000:.0f} cm3")
+    main, cr = main_griffue()
+    rendu["bois"].append(exporter(main, "tete_2_main_ecorce.stl", Z_COL1))
+    rendu["cristaux"].append(exporter(cr, "tete_2_main_cristaux.stl", Z_COL1))
 
-    m = vers_trimesh(cristaux())
-    m.export(SORTIE / "stl" / "tete_3_cristaux.stl")
-    assemble.append((m.copy().apply_translation((cx, cy, Z_COL1 + hp - 12)), OR))
-    print(f"tete_3_cristaux.stl  {m.extents.round(1)} mm  {m.volume / 1000:.0f} cm3")
-
-    for p, _ in assemble:
-        assert p.is_watertight and p.body_count == 1, "maillage défectueux"
-
-    # assemblage complet (pour visualiser, pas pour imprimer)
-    bois = trimesh.util.concatenate([m for m, c in assemble if c is BOIS])
-    bois.export(SORTIE / "apercu" / "assemblage_bois.stl")
-    assemble[-1][0].export(SORTIE / "apercu" / "assemblage_cristaux.stl")
-    total = sum(p.volume for p, _ in assemble) / 1000
-    print(f"Volume plein total : {total:.0f} cm3")
+    # assemblage complet pour les aperçus (non versionné)
+    (SORTIE / "apercu").mkdir(exist_ok=True)
+    for cle, morceaux in rendu.items():
+        trimesh.util.concatenate(morceaux).export(SORTIE / "apercu" / f"assemblage_{cle}.stl")
