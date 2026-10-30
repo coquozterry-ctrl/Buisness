@@ -54,7 +54,7 @@ def vers_manifold(m: trimesh.Trimesh) -> Manifold:
 
 def vers_trimesh(man: Manifold) -> trimesh.Trimesh:
     mm = man.to_mesh()
-    return trimesh.Trimesh(mm.vert_properties[:, :3], mm.tri_verts, process=True)
+    return trimesh.Trimesh(mm.vert_properties[:, :3], mm.tri_verts, process=False)
 
 
 def loft(anneaux: np.ndarray) -> Manifold:
@@ -113,9 +113,9 @@ class Cellules:
         return (d[:, 1] - d[:, 0]).reshape(p.shape[:-1]), self.h[i[:, 0]].reshape(p.shape[:-1])
 
 
-PLAQUES = Cellules(9.0, 2.6, GRAINE)
+PLAQUES = Cellules(8.0, 4.0, GRAINE)        # plaques allongées : sillons d'écorce d'arbre
 GERCURES = Cellules(3.0, 1.8, GRAINE + 1)
-PROF_ECORCE = 3.0
+PROF_ECORCE = 3.4
 
 
 def ecorce(p):
@@ -125,7 +125,7 @@ def ecorce(p):
     fissure = np.clip(1 - e1 / 2.0, 0, 1) ** 1.3
     gercure = np.clip(1 - e2 / 0.7, 0, 1)
     fibres = np.sin(p[..., 2] * 0.9 + 3 * np.sin(p[..., 0] * 0.21) + 3 * np.sin(p[..., 1] * 0.19))
-    return -2.2 * fissure + 0.45 * h1 * (1 - fissure) - 0.5 * gercure + 0.15 * fibres
+    return -2.6 * fissure + 0.5 * h1 * (1 - fissure) - 0.5 * gercure + 0.15 * fibres
 
 
 def texturer(anneaux, echelle=1.0):
@@ -253,13 +253,83 @@ def grappe(o) -> Manifold:
     return union(pieces)
 
 
+# ---------------------------------------------------------------- BRANCHES CASSÉES
+def placer(man, p, d):
+    """Oriente une pièce modélisée le long de +z selon la direction d, au point p."""
+    d = d / np.linalg.norm(d)
+    u = np.cross(d, [0, 0, 1.0])
+    u = u / np.linalg.norm(u) if np.linalg.norm(u) > 1e-6 else np.array([1.0, 0, 0])
+    v = np.cross(d, u)
+    return man.transform(np.column_stack([u, v, d, p]))
+
+
+def chicot(g, z, th):
+    """Moignon de branche écorcé, cassé net, avec le bois clair éclaté au bout."""
+    surf = points_bois(np.array([z]), np.array([th]))[0]
+    cx, cy = centre(z)
+    rad = np.array([surf[0] - cx, surf[1] - cy, 0.0])
+    rad /= np.linalg.norm(rad)
+    e = math.radians(g.uniform(42, 60))                       # pointe vers le haut : imprimable
+    d = math.cos(e) * rad + math.sin(e) * np.array([0, 0, 1.0])
+    r0, L = g.uniform(5, 11), g.uniform(15, 45)
+    ancrage = 1.6 * r0 + 4                                     # départ bien noyé dans le tronc
+    t = np.linspace(0, 1, max(int((L + ancrage) / PAS), 20))
+    courbe = np.outer(t ** 2, [0, 0, 1.0]) * g.uniform(0, 0.15) * L
+    pts = surf - ancrage * d + np.outer(t, d * (L + ancrage)) + courbe
+    tb = ancrage / (L + ancrage)                               # position de la surface du tronc
+    r = r0 * (1 + 0.3 * np.exp(-np.clip(t - tb, 0, None) / 0.08)) * (1 - 0.2 * t)  # bourrelet
+    ecorce_ch = tube_balaye(pts, r, n=72, texture=np.full(len(t), 0.6))
+
+    bout, axe = pts[-1], pts[-1] - pts[-2]
+    rc = r[-1] * 0.78
+    coeur = [Manifold.cylinder(4, rc, rc, 48).translate((0, 0, -3.5))]
+    for k in range(g.integers(5, 9)):                          # échardes
+        a, rr = g.uniform(0, 2 * math.pi), g.uniform(0, rc * 0.75)
+        x, y = rr * math.cos(a), rr * math.sin(a)
+        w = g.uniform(1.0, 2.0)
+        base = [[x + w * math.cos(b), y + w * math.sin(b), 0] for b in (0, 2.1, 4.2)]
+        pointe = [[x + g.uniform(-1.5, 1.5), y + g.uniform(-1.5, 1.5), g.uniform(2, 3 + r0 * 0.6)]]
+        coeur.append(Manifold.hull_points(np.array(base + pointe)))
+    coeur = placer(union(coeur), bout, axe)
+    return ecorce_ch - coeur, coeur
+
+
+def chicots():
+    """Répartit les moignons sur toute la montée, loin des jointures et de la veine."""
+    g = np.random.default_rng(GRAINE + 4)
+    h = LONGUEUR_FUT / NB_SEGMENTS
+    coupes = [0, *(h * k for k in range(1, NB_SEGMENTS + 1)), Z_COL1]
+    voulus = [4] * NB_SEGMENTS + [2]
+    places = []
+    for (z0, z1), n in zip(zip(coupes, coupes[1:]), voulus):
+        essais = 0
+        while sum(z0 <= p[0] < z1 for p in places) < n and essais < 500:
+            essais += 1
+            z, th = g.uniform(z0 + 25, z1 - 60), g.uniform(0, 2 * math.pi)
+            th_veine = (math.pi + torsion(z)) / 3 + 0.15 * math.sin(z / 47)
+            if abs(np.angle(np.exp(1j * (th - th_veine)))) < 0.9:
+                continue
+            if any(abs(z - pz) < 70 and abs(np.angle(np.exp(1j * (th - pt)))) < 1.2 for pz, pt in places):
+                continue
+            places.append((z, th))
+    return [(z, *chicot(g, z, th)) for z, th in places]
+
+
 # ---------------------------------------------------------------- PIÈCES
-def segment_fut(i, filon):
+def ajouter_chicots(bois, liste, z0, z1):
+    clair = [c for z, _, c in liste if z0 <= z < z1]
+    bois = union([bois] + [e for z, e, _ in liste if z0 <= z < z1])
+    clair = union(clair) if clair else None
+    return (bois - clair if clair else bois), clair
+
+
+def segment_fut(i, filon, liste):
     h = LONGUEUR_FUT / NB_SEGMENTS
     z0 = i * h
     alesage = cylindre(R_ALESAGE, h + 2, z0 - 1)
-    bois = loft(surface_bois(z0, z0 + h)) - alesage
-    return bois - filon, (filon ^ bois.hull()) - alesage
+    bois, clair = ajouter_chicots(loft(surface_bois(z0, z0 + h)), liste, z0, z0 + h)
+    bois = bois - alesage
+    return bois - filon, (filon ^ bois.hull()) - alesage, clair
 
 
 def trous_goupilles():
@@ -272,14 +342,14 @@ def trous_goupilles():
     return trous[0] + trous[1]
 
 
-def col(filon):
+def col(filon, liste):
     cx, cy = centre(Z_COL1)
-    bois = loft(surface_bois(Z_COL0, Z_COL1))
+    bois, clair = ajouter_chicots(loft(surface_bois(Z_COL0, Z_COL1)), liste, Z_COL0, Z_COL1)
     bois = bois - cylindre(R_ALESAGE, PROF_DOUILLE + 1, Z_COL0 - 1)               # douille
     bois = bois + cylindre(R_TENON, H_TENON + 1, Z_COL1 - 1, cx, cy)              # tenon
     bois = bois - cylindre(DIAM_LED / 2, 23, Z_COL1 + H_TENON - 22, cx, cy)       # logement bougie
     bois = bois - trous_goupilles()
-    return bois - filon, (filon ^ bois.hull()) - cylindre(R_ALESAGE, PROF_DOUILLE + 1, Z_COL0 - 1)
+    return bois - filon, (filon ^ bois.hull()) - cylindre(R_ALESAGE, PROF_DOUILLE + 1, Z_COL0 - 1), clair
 
 
 def main_griffue():
@@ -316,6 +386,7 @@ def main_griffue():
 
 # ---------------------------------------------------------------- MAIN
 def exporter(man, nom, z):
+    man = Manifold.compose([c for c in man.decompose() if c.volume() > 2.0])   # sans miettes
     m = vers_trimesh(man)
     assert m.is_watertight, f"{nom} : maillage non étanche"
     m.apply_translation((0, 0, -z))
@@ -336,17 +407,22 @@ if __name__ == "__main__":
         f.unlink()
     filon = veine()
     h = LONGUEUR_FUT / NB_SEGMENTS
-    rendu = {"bois": [], "veine": [], "cristaux": []}
+    liste = chicots()
+    rendu = {"bois": [], "veine": [], "cristaux": [], "clair": []}
     for i in range(NB_SEGMENTS):
-        bois, v = segment_fut(i, filon)
+        bois, v, clair = segment_fut(i, filon, liste)
         verifier_paroi(bois + v, i * h, (i + 1) * h)          # la veine compte dans la paroi
         rendu["bois"].append(exporter(bois, f"fut_{i + 1}_ecorce.stl", i * h))
         rendu["veine"].append(exporter(v, f"fut_{i + 1}_veine.stl", i * h))
+        if clair:
+            rendu["clair"].append(exporter(clair, f"fut_{i + 1}_bois_clair.stl", i * h))
 
-    bois, v = col(filon)
+    bois, v, clair = col(filon, liste)
     verifier_paroi(bois + v, Z_COL0, Z_COL0 + PROF_DOUILLE)
     rendu["bois"].append(exporter(bois, "tete_1_col_ecorce.stl", Z_COL0))
     rendu["veine"].append(exporter(v, "tete_1_col_veine.stl", Z_COL0))
+    if clair:
+        rendu["clair"].append(exporter(clair, "tete_1_col_bois_clair.stl", Z_COL0))
 
     main, cr = main_griffue()
     rendu["bois"].append(exporter(main, "tete_2_main_ecorce.stl", Z_COL1))
