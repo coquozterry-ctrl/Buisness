@@ -2,3 +2,5 @@ __pycache__/
 # Résultats bruts de recherche automatique et captures (lourdes, régénérables)
 prospects/liste.json
 prospects/**/captures/
+guggen/baton/apercu/*.stl
+__pycache__/
