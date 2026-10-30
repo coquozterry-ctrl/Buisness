@@ -1,7 +1,8 @@
 # Bâton de la Guggen
 
-Bâton d'environ **1,90 m** en bois d'arbre tordu, hérissé de branches cassées sur toute la
-montée, parcouru d'une veine dorée, avec en haut une main noueuse qui enserre des cristaux
+Bâton d'environ **1,95 m** façon tronc d'arbre tordu d'Halloween : trois brins de bois
+enroulés, nœuds creux, bosses, branches cassées, une veine dorée au fond d'un sillon.
+En haut, le col se cambre en S et les brins s'ouvrent en griffes qui enserrent des cristaux
 éclairés par une bougie LED orange.
 Conçu pour une **Prusa XL multi-têtes** (plateau 360 × 360 × 360 mm).
 
@@ -14,13 +15,13 @@ Conçu pour une **Prusa XL multi-têtes** (plateau 360 × 360 × 360 mm).
 - Un **tube alu (ou fibre de verre) Ø16 mm** passe à l'intérieur et donne la solidité.
   Les tronçons imprimés s'enfilent dessus et se collent. Un bâton tout en plastique
   casserait au premier choc.
-- Le tube est droit, mais l'extérieur ondule : la paroi est automatiquement épaissie
-  là où le bois s'approche du tube (au moins 3,5 mm partout, vérifié par le script).
+- Autour du tube, un cœur (paroi d'au moins 3,5 mm, vérifiée par le script) et trois brins
+  qui s'enroulent d'un tour tous les 33 cm, avec un pied évasé comme des racines.
 - La texture d'écorce (sillons verticaux et gerçures) est continue d'un tronçon à l'autre.
-- **18 branches cassées** sortent de l'écorce sur toute la hauteur (4 par tronçon, 2 sur le col).
+- **9 nœuds creux** et **9 branches cassées** répartis sur la hauteur, loin des jointures.
   Elles pointent vers le haut (42 à 60°) pour s'imprimer sans support. Le bout éclaté
   (bois clair et échardes) est une pièce séparée, à imprimer dans une 4e couleur.
-- La **veine dorée** est une pièce séparée, logée dans le sillon de l'écorce : à imprimer
+- La **veine dorée** est une pièce séparée, logée au fond du sillon entre deux brins : à imprimer
   dans une 2e couleur (PLA soie or ou cuivre).
 - Les **cristaux** sont imprimés en même temps que la main, dans une 3e couleur (PLA
   translucide orange ou fumé) : les doigts les enserrent, ils ne s'enlèvent pas.
@@ -39,9 +40,11 @@ Chaque pièce multi-couleur = plusieurs STL à charger **ensemble** dans PrusaSl
 
 | Pièce | Fichiers | Taille (mm) | Outils |
 |---|---|---|---|
-| Fût 1 à 4 (1 = pied) | `fut_N_ecorce.stl` + `fut_N_veine.stl` + `fut_N_bois_clair.stl` | ~100 × 100 × 350 | T1, T2, T4 |
-| Col | `tete_1_col_ecorce.stl` + `tete_1_col_veine.stl` + `tete_1_col_bois_clair.stl` | ~99 × 89 × 275 | T1, T2, T4 |
-| Main + cristaux | `tete_2_main_ecorce.stl` + `tete_2_main_cristaux.stl` | ~137 × 114 × 212 | T1, T3 translucide |
+| Fût 1 à 4 (1 = pied) | `fut_N_ecorce.stl` + `fut_N_veine.stl` (+ `fut_N_bois_clair.stl`) | ~75-100 × 75 × 350 | T1, T2, T4 |
+| Col en S | `tete_1_col_ecorce.stl` + `tete_1_col_veine.stl` + `tete_1_col_bois_clair.stl` | ~103 × 104 × 325 | T1, T2, T4 |
+| Griffes + cristaux | `tete_2_main_ecorce.stl` + `tete_2_main_cristaux.stl` | ~143 × 136 × 195 | T1, T3 translucide |
+
+Le tronçon 2 n'a pas de branche cassée : pas de fichier `bois_clair` pour lui.
 
 Dans PrusaSlicer : sélectionner les 2 ou 3 fichiers d'une pièce, les glisser ensemble, répondre
 **Oui** à « charger comme un seul objet à plusieurs parties », puis attribuer un extrudeur à
@@ -59,7 +62,8 @@ chaque partie. Les fichiers partagent la même origine : rien à aligner.
 
 - Fût et col : debout, 3 parois, 10 % de remplissage gyroïde, sans support.
   Buse 0,4 mm, couches 0,2 mm (0,15 mm pour une écorce plus fine).
-- Main : debout, **supports organiques** sous les doigts.
+- Col : debout, supports organiques sous le ventre du S.
+- Griffes : debout, **supports organiques** sous les griffes.
 - Cristaux : réglage de pièce dans PrusaSlicer, 2 parois et 0 % de remplissage pour qu'ils
   restent bien translucides.
 - Estimation : ~1,2 à 1,5 kg de filament noir, ~100 g d'or, ~60 g de translucide.
@@ -79,7 +83,7 @@ Imprimée en brun, l'écorce est déjà crédible. Pour un vrai rendu d'arbre : 
 foncé dans les sillons, essuyé tout de suite, puis un brossage à sec beige-gris sur les reliefs.
 Vernis mat par-dessus, en masquant la veine, les bouts cassés et les cristaux.
 
-Les branches cassées dépassent de 2 à 4 cm : en cortège, elles peuvent accrocher un costume
+Les branches cassées dépassent de 1,5 à 4 cm : en cortège, elles peuvent accrocher un costume
 ou casser sur un choc. Elles sont pleines et ancrées dans le tronc, mais si l'une casse, un
 point de colle époxy suffit.
 
