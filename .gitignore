@@ -4,3 +4,4 @@ prospects/liste.json
 prospects/**/captures/
 guggen/baton/apercu/*.stl
 __pycache__/
+guggen/baton_hybride/apercu/*.stl
