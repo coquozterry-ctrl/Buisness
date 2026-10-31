@@ -1,11 +1,12 @@
-"""Génère le bâton de la Guggen en pièces imprimables multi-matériaux (Prusa XL).
+"""Génère le bâton de la Guggen en pièces imprimables multi-matériaux (Prusa XL 5 têtes).
 
-Principe : un tube alu Ø16 mm sert d'âme (solidité). Autour, trois brins de bois
-s'enroulent comme un tronc d'arbre tordu d'Halloween (nœuds creux, bosses, branches
-cassées). Une veine dorée coule au fond d'un sillon (2e couleur). En haut, le col se
-cambre en S et les brins s'ouvrent en griffes qui enserrent des cristaux translucides
-(3e couleur). Les bouts de branches cassées sont en bois clair (4e couleur).
-La main s'emboîte sur le col, qui cache une bougie LED.
+Principe : un tube alu Ø16 mm sert d'âme (solidité). Autour, un fût droit en bois sombre
+veiné, enlacé de lianes qui s'enroulent dans les deux sens et s'évasent en racines au pied.
+Au tiers supérieur, une poignée en cuir enroulé avec un médaillon. En haut, les lianes
+s'ouvrent et tiennent un bouquet de cristaux violets et verts, éclairé par une bougie LED
+logée dans le col. Des petits cristaux pendants s'accrochent à la poignée.
+
+Têtes : T1 bois sombre, T2 lianes (bronze), T3 cristaux violets, T4 cristaux verts, T5 cuir.
 
 Usage : python3 generer_baton.py   (écrit les STL dans ./stl)
 Toutes les cotes sont en mm et se règlent dans le bloc PARAMÈTRES.
@@ -24,29 +25,24 @@ LONGUEUR_FUT = 1400        # longueur de la partie tube (sans la tête)
 NB_SEGMENTS = 4            # 4 x 350 mm : plateau Prusa XL 360 x 360 x 360
 DIAM_TUBE = 16.0           # tube alu (ou fibre de verre) Ø16 mm
 JEU = 0.4                  # jeu pour enfiler les pièces sur le tube
-PAROI_MIN = 3.5            # paroi minimale autour du tube, sous l'écorce
-RAYON_BRIN = 11.0          # rayon moyen de chacun des 3 brins tordus
-PAS_TORSION = 330.0        # hauteur d'un tour complet des brins
-ONDULATION = 6.0           # amplitude des ondulations du tronc
+PAROI_MIN = 3.5            # paroi minimale autour du tube
+RAYON_FUT = 15.0           # rayon du fût en bois (Ø30, ≈ Ø40-45 avec les lianes)
+NB_LIANES = 14
+POIGNEE = (1120.0, 1350.0) # zone de la poignée en cuir
 PROF_DOUILLE = 120         # profondeur du tube dans le col
 DIAM_LED = 42.0            # bougie LED « chauffe-plat » Ø38 mm
-NB_NOEUDS_CREUX = 9
-NB_CHICOTS = 8             # départs de branches cassées
-NB_PLAQUES = 12            # lambeaux d'écorce soulevés
-GRAINE = 7                 # change la graine pour un autre bâton "unique"
+GRAINE = 11                # change la graine pour un autre bâton "unique"
 
-PAS = 0.7                  # finesse du maillage (taille des fissures ≈ 2 mm)
+PAS = 0.7                  # finesse du maillage
 SORTIE = Path(__file__).parent
 
 R_ALESAGE = DIAM_TUBE / 2 + JEU / 2
-PROF_ECORCE = 5.0
-R_COEUR = R_ALESAGE + PAROI_MIN + PROF_ECORCE
 Z_COL0 = LONGUEUR_FUT
-Z_COL1 = LONGUEUR_FUT + 300        # col en S (pièce de 300 mm + tenon)
-R_TENON, H_TENON = 24.0, 25.0      # emboîtement main / col (contient la bougie)
-HP = 50.0                          # hauteur de la paume
+Z_COL1 = LONGUEUR_FUT + 160        # col : douille du tube + logement de la bougie
+R_TENON, H_TENON = 24.0, 25.0      # emboîtement bouquet / col (contient la bougie)
+R_TETE = 28.0                      # rayon du fût en haut du col
+HP = 40.0                          # hauteur de la base du bouquet
 H_SEG = LONGUEUR_FUT / NB_SEGMENTS
-JOINTS = [H_SEG * k for k in range(NB_SEGMENTS + 1)] + [Z_COL1]
 
 
 # ---------------------------------------------------------------- OUTILS MAILLAGE
@@ -96,29 +92,27 @@ def tranche(z0, z1) -> Manifold:
 
 
 def union(pieces):
+    pieces = [p for p in pieces if p is not None]
     tout = pieces[0]
     for p in pieces[1:]:
         tout = tout + p
     return tout
 
 
-def placer(man, p, d):
-    """Oriente une pièce modélisée le long de +z selon la direction d, au point p."""
-    d = d / np.linalg.norm(d)
-    u = np.cross(d, [0, 0, 1.0])
-    u = u / np.linalg.norm(u) if np.linalg.norm(u) > 1e-6 else np.array([1.0, 0, 0])
-    return man.transform(np.column_stack([u, np.cross(d, u), d, p]))
+def lisse(t):
+    t = np.clip(t, 0, 1)
+    return t * t * (3 - 2 * t)
 
 
-# ---------------------------------------------------------------- TEXTURE D'ÉCORCE
+# ---------------------------------------------------------------- TEXTURES
 class Cellules:
-    """Bruit cellulaire 3D (Worley) : plaques d'écorce séparées par des sillons."""
+    """Bruit cellulaire 3D (Worley)."""
 
     def __init__(self, taille, etirement, graine):
         g = np.random.default_rng(graine)
         self.S = np.array([1.0, 1.0, 1.0 / etirement])
-        lo = np.array([-250, -250, -50]) * self.S
-        hi = np.array([300, 300, Z_COL1 + 450]) * self.S
+        lo = np.array([-150, -150, -50]) * self.S
+        hi = np.array([150, 150, Z_COL1 + 400]) * self.S
         axes = [np.arange(l, h, taille) for l, h in zip(lo, hi)]
         base = np.stack(np.meshgrid(*axes, indexing="ij"), -1).reshape(-1, 3)
         self.arbre = cKDTree(base + g.uniform(0, taille, base.shape))
@@ -129,31 +123,30 @@ class Cellules:
         return (d[:, 1] - d[:, 0]).reshape(p.shape[:-1]), self.h[i[:, 0]].reshape(p.shape[:-1])
 
 
-PLAQUES = Cellules(10.0, 3.5, GRAINE)       # plaques allongées : sillons d'écorce d'arbre
-TRAVERS = Cellules(5.0, 0.5, GRAINE + 2)    # cassures en travers des plaques
-GERCURES = Cellules(3.0, 1.8, GRAINE + 1)
+VEINES_BOIS = Cellules(5.0, 7.0, GRAINE)        # longues fentes du bois
+ECORCE_LIANE = Cellules(3.5, 2.5, GRAINE + 1)   # petite écorce des lianes
 
 
-def ecorce(p):
-    """Déplacement (mm, négatif = vers l'intérieur) de l'écorce au point p."""
-    e1, h1 = PLAQUES(p)
-    e2, _ = GERCURES(p)
-    e3, _ = TRAVERS(p)
-    sillon = np.clip(1 - e1 / 3.2, 0, 1) ** 1.4                # sillons profonds entre les plaques
-    plaque = (1.3 + 0.9 * h1) * (1 - sillon)                     # plaques qui ressortent
-    travers = np.clip(1 - e3 / 0.9, 0, 1) * (1 - sillon)
-    gercure = np.clip(1 - e2 / 0.7, 0, 1)
-    fibres = np.sin(p[..., 2] * 0.9 + 3 * np.sin(p[..., 0] * 0.21) + 3 * np.sin(p[..., 1] * 0.19))
-    return plaque - 3.6 * sillon - 1.1 * travers - 0.4 * gercure + 0.15 * fibres
+def grain_bois(p):
+    """Bois sombre veiné : longues fentes fines + fibres."""
+    e, h = VEINES_BOIS(p)
+    fente = np.clip(1 - e / 1.1, 0, 1)
+    fibres = np.sin(np.arctan2(p[..., 1], p[..., 0]) * 40 + p[..., 2] * 0.05 + 2 * np.sin(p[..., 2] / 37))
+    return -0.9 * fente + 0.15 * h + 0.12 * fibres
 
 
-def texturer(anneaux, echelle=1.0):
-    d = ecorce(anneaux) * np.broadcast_to(echelle, anneaux.shape[:-1])
+def ecorce_liane(p):
+    e, h = ECORCE_LIANE(p)
+    return -0.7 * np.clip(1 - e / 0.9, 0, 1) + 0.2 * h
+
+
+def texturer(anneaux, fonction, echelle=1.0):
+    d = fonction(anneaux) * np.broadcast_to(echelle, anneaux.shape[:-1])
     return anneaux + normales(anneaux) * d[..., None]
 
 
 def tube_balaye(pts, rayons, n=24, texture=None, aplat=1.0):
-    """Tube le long d'une courbe 3D (repère par transport parallèle), section ovale si aplat < 1."""
+    """Tube le long d'une courbe 3D (repère par transport parallèle)."""
     pts = np.asarray(pts, float)
     tang = np.gradient(pts, axis=0)
     tang /= np.linalg.norm(tang, axis=1)[:, None]
@@ -168,226 +161,99 @@ def tube_balaye(pts, rayons, n=24, texture=None, aplat=1.0):
         anneaux.append(p + r * (np.outer(np.cos(th), nrm) + aplat * np.outer(np.sin(th), b)))
     anneaux = np.array(anneaux)
     if texture is not None:
-        anneaux = texturer(anneaux, np.asarray(texture)[:, None] * np.ones(n))
+        anneaux = texturer(anneaux, ecorce_liane, np.asarray(texture)[:, None] * np.ones(n))
     return loft(anneaux)
 
 
-# ---------------------------------------------------------------- FORME DU TRONC
-def lisse(t):
-    t = np.clip(t, 0, 1)
-    return t * t * (3 - 2 * t)
+# ---------------------------------------------------------------- FÛT
+def rayon_fut(z):
+    r = RAYON_FUT + 0.6 * np.sin(z / 190.0) + 0.3 * np.sin(z / 61.0)
+    return r + (R_TETE - RAYON_FUT) * lisse((z - Z_COL0 - PROF_DOUILLE + 30) / (Z_COL1 - Z_COL0 - PROF_DOUILLE + 30))
 
 
-def torsion(z):
-    return 2 * math.pi * z / PAS_TORSION + 0.8 * np.sin(z / 260.0)
-
-
-T_COL = (Z_COL0 + PROF_DOUILLE + 5, Z_COL1)      # zone du col en S (au-dessus du tube)
-
-
-def courbe_col(z):
-    """Le col se cambre en S puis la tête penche, comme sur la photo."""
-    t = np.clip((np.asarray(z, float) - T_COL[0]) / (T_COL[1] - T_COL[0]), 0, 1)
-    return 55 * np.sin(math.pi * t) * t + 22 * t ** 2, -25 * np.sin(2 * math.pi * t)
-
-
-def centre_coeur(z):
-    return courbe_col(z)
-
-
-def centre_tronc(z):
-    """Ligne moyenne des brins : ondule le long du tube, suit le S du col."""
-    x = ONDULATION * (np.sin(2 * math.pi * z / 520 + 0.4) + 0.5 * np.sin(2 * math.pi * z / 230 + 1.7))
-    y = ONDULATION * (0.8 * np.sin(2 * math.pi * z / 610 + 2.1) + 0.4 * np.sin(2 * math.pi * z / 270))
-    f = 1 - lisse((z - Z_COL0) / 150)                              # le S du col prend le relais
-    cx, cy = courbe_col(z)
-    return x * f + cx, y * f + cy
-
-
-def rayon_coeur(z):
-    return R_COEUR + 13.0 * lisse((z - Z_COL0 - PROF_DOUILLE) / (Z_COL1 - Z_COL0 - PROF_DOUILLE))
-
-
-def ecart_brins(z):
-    pied = 9.0 * np.exp(-z / 45.0)                                 # le pied s'évase comme des racines
-    return 14.5 + 1.5 * np.sin(z / 133.0) + pied + 19.0 * lisse((z - Z_COL0 - 60) / 240)
-
-
-g0 = np.random.default_rng(GRAINE)
-BOSSES = [(int(g0.integers(3)), g0.uniform(60, Z_COL1 - 30), g0.uniform(3, 6), g0.uniform(15, 35))
-          for _ in range(16)]
-
-
-def rayon_brin(k, z):
-    r = RAYON_BRIN + 2.0 * np.sin(z / 97.0 + 2.1 * k) + 1.2 * np.sin(z / 41.0 + k)
-    r = r + 4.0 * np.exp(-z / 45.0)
-    for kb, zb, hb, wb in BOSSES:
-        if kb == k:
-            r = r + hb * np.exp(-((z - zb) / wb) ** 2)
-    return r
-
-
-def angle_brin(k, z):
-    return torsion(z) + 2 * math.pi * k / 3 + 0.25 * np.sin(z / 71.0 + 3 * k)
-
-
-def axe_brin(k, z):
-    cx, cy = centre_tronc(z)
-    a, e = angle_brin(k, z), ecart_brins(z)
-    return np.stack([cx + e * np.cos(a), cy + e * np.sin(a), z], -1)
-
-
-def brin(k, z0, z1):
-    z = np.arange(z0, z1 + 1e-6, 0.6)
-    return tube_balaye(axe_brin(k, z), rayon_brin(k, z), n=100, texture=np.ones(len(z)))
-
-
-def coeur(z0, z1):
+def fut(z0, z1):
     zs = np.linspace(z0, z1, int(round((z1 - z0) / PAS)) + 1)
-    th = np.linspace(0, 2 * math.pi, 160, endpoint=False)
+    th = np.linspace(0, 2 * math.pi, 200, endpoint=False)
     Z, TH = np.meshgrid(zs, th, indexing="ij")
-    cx, cy = centre_coeur(Z)
-    R = rayon_coeur(Z) + 0.8 * np.sin(3 * TH + Z / 40)
-    s = texturer(np.stack([cx + R * np.cos(TH), cy + R * np.sin(TH), Z], -1))
+    R = rayon_fut(Z)
+    s = texturer(np.stack([R * np.cos(TH), R * np.sin(TH), Z], -1), grain_bois)
     s[..., 2] = np.where(np.isin(Z, (z0, z1)), Z, s[..., 2])
     return loft(s)
 
 
-def tronc(z0, z1):
-    """Cœur + 3 brins tordus, coupés net aux jointures."""
-    morceaux = [coeur(z0, z1)] + [brin(k, z0 - 20, z1 + 20) for k in range(3)]
+# ---------------------------------------------------------------- LIANES
+g0 = np.random.default_rng(GRAINE)
+LIANES = []
+for i in range(NB_LIANES):
+    epaisse = i < 3
+    LIANES.append(dict(
+        r=g0.uniform(4.2, 5.5) if epaisse else g0.uniform(2.6, 4.0),
+        sens=1 if i % 2 else -1,
+        pas=g0.uniform(260, 520),
+        phase=g0.uniform(0, 2 * math.pi),
+        decol=g0.uniform(0, 2 * math.pi),
+    ))
+
+
+def angle_liane(L, z):
+    return L["phase"] + L["sens"] * 2 * math.pi * z / L["pas"] + 0.35 * np.sin(z / 83.0 + L["phase"])
+
+
+def rayon_liane(L, z):
+    r = L["r"] * (1 + 0.12 * np.sin(z / 47.0 + L["phase"]))
+    return r * (1 + 0.6 * np.exp(-z / 40.0))                      # plus épaisses au pied (racines)
+
+
+def orbite_liane(L, z):
+    rv = rayon_liane(L, z)
+    decolle = 0.45 * np.clip(np.sin(z / 70.0 + L["decol"]), 0, 1) ** 4   # par endroits elle se décolle
+    racine = 16.0 * np.exp(-z / 38.0)                                     # évasement en racines
+    sous_cuir = lisse((z - POIGNEE[0] + 5) / 25) * lisse((POIGNEE[1] + 5 - z) / 25)
+    return rayon_fut(z) + rv * (0.45 + decolle) * (1 - sous_cuir) - rv * 1.2 * sous_cuir + racine
+
+
+def axe_liane(L, z):
+    a, o = angle_liane(L, z), orbite_liane(L, z)
+    return np.stack([o * np.cos(a), o * np.sin(a), z], -1)
+
+
+def lianes(z0, z1):
+    morceaux = []
+    for L in LIANES:
+        z = np.arange(max(z0 - 15, 0.0), z1 + 15, 0.6)
+        if z[0] == 0.0:                                                # le pied pose bien à plat
+            z = np.concatenate([[-3.0], z])
+        morceaux.append(tube_balaye(axe_liane(L, z), rayon_liane(L, z), n=40,
+                                    texture=np.full(len(z), 0.6)))
     return union(morceaux) ^ tranche(z0, z1)
 
 
-# ---------------------------------------------------------------- DÉTAILS
-def point_exterieur(k, z):
-    """Point de la surface d'un brin, côté extérieur, et direction sortante."""
-    p = axe_brin(k, np.array([z]))[0]
-    cx, cy = centre_coeur(z)
-    out = np.array([p[0] - cx, p[1] - cy, 0.0])
-    out /= np.linalg.norm(out)
-    return p + out * rayon_brin(k, z), out
+# ---------------------------------------------------------------- POIGNÉE
+def cuir():
+    """Lanière de cuir enroulée en hélice, chaque tour recouvrant le précédent."""
+    z0, z1 = POIGNEE
+    zs = np.linspace(z0, z1, int((z1 - z0) / 0.5) + 1)
+    th = np.linspace(0, 2 * math.pi, 240, endpoint=False)
+    Z, TH = np.meshgrid(zs, th, indexing="ij")
+    q = (Z - z0) / 15.0 + TH / (2 * math.pi)
+    f = q - np.floor(q)
+    bord = lisse(np.minimum(Z - z0, z1 - Z) / 4)
+    R = rayon_fut(Z) + (3.0 + 1.4 * f ** 1.5) * bord              # les lianes passent dessous
+    enveloppe = loft(np.stack([R * np.cos(TH), R * np.sin(TH), Z], -1))
+    return enveloppe - cylindre(RAYON_FUT - 2, z1 - z0 + 2, z0 - 1)
 
 
-def emplacements(n, marge_bas, marge_haut, graine, deja=()):
-    g = np.random.default_rng(graine)
-    pris = list(deja)
-    res = []
-    while len(res) < n:
-        z, k = g.uniform(60, Z_COL1 - 80), int(g.integers(3))
-        if any(j - marge_bas < z < j + marge_haut for j in JOINTS):
-            continue
-        if any(abs(z - pz) < 60 and pk == k for pz, pk in pris):
-            continue
-        pris.append((z, k))
-        res.append((z, k))
-    return res
-
-
-def noeuds_creux():
-    """Bosse avec un trou sombre au centre, sur la face extérieure d'un brin."""
-    g = np.random.default_rng(GRAINE + 5)
-    plus, moins = [], []
-    for z, k in emplacements(NB_NOEUDS_CREUX, 25, 25, GRAINE + 6):
-        p, out = point_exterieur(k, z)
-        r = g.uniform(6, 9)
-        c = p - out * r * 0.7
-        bosse = Manifold.sphere(r * 1.25, 48).scale((1, 1, 1.5)).translate(tuple(c))
-
-        def ecorcer(v, c=c):                                   # même écorce que le tronc
-            n = v - c
-            n /= np.linalg.norm(n, axis=1, keepdims=True)
-            return v + n * (0.6 * ecorce(v))[:, None]
-
-        plus.append((z, bosse.refine_to_length(0.8).warp_batch(ecorcer)))
-        trou = Manifold.sphere(r * 0.7, 48).scale((1, 1, 1.6))
-        moins.append((z, placer(trou, p + out * 0.8 * r * 0.4, out)))
-    return plus, moins
-
-
-def chicot(g, p, out):
-    """Gros départ de branche écorcé, cassé en éclats, cernes du bois visibles au bout."""
-    e = math.radians(g.uniform(45, 62))                       # pointe vers le haut : imprimable
-    d = math.cos(e) * out + math.sin(e) * np.array([0, 0, 1.0])
-    r0, L = g.uniform(10, 15), g.uniform(18, 35)
-    ancrage = 1.4 * r0 + 4
-    t = np.linspace(0, 1, max(int((L + ancrage) / PAS), 20))
-    pts = p - ancrage * d + np.outer(t, d * (L + ancrage)) + np.outer(t ** 2, [0, 0, 1.0]) * g.uniform(0, 0.12) * L
-    tb = ancrage / (L + ancrage)
-    r = r0 * (1 + 0.55 * np.exp(-np.clip(t - tb, 0, None) / 0.15)) * (1 - 0.15 * t)   # gros bourrelet
-    ecorce_ch = tube_balaye(pts, r, n=120, texture=np.full(len(t), 0.8))
-
-    rc = r[-1] * 0.85
-    p1, p2, ph = g.uniform(0, 6.3), g.uniform(0, 6.3), g.uniform(0.6, 1.0)
-
-    def casser(v):                                             # cassure en gros éclats + cernes
-        x, y, z = v[:, 0], v[:, 1], v[:, 2]
-        a, rho = np.arctan2(y, x), np.hypot(x, y) / rc
-        haut = (z > 0.99).astype(float)                       # seulement la face du bout
-        eclats = rho * (3.5 * np.sin(2 * a + p1) + 2.0 * np.sin(3 * a + p2)) * ph
-        cernes = -0.35 * np.cos(rho * rc * 2.4) ** 8
-        return np.stack([x, y, z + haut * (np.maximum(eclats, -1.0) + 1.5 + cernes)], -1)
-
-    coeur_ch = Manifold.cylinder(2.5, rc, rc, 96).translate((0, 0, -1.5)).refine_to_length(0.7).warp_batch(casser)
-    coeur_ch = placer(coeur_ch, pts[-1], pts[-1] - pts[-2])
-    return ecorce_ch - coeur_ch, coeur_ch
-
-
-def chicots():
-    g = np.random.default_rng(GRAINE + 4)
-    res = []
-    for z, k in emplacements(NB_CHICOTS, 20, 60, GRAINE + 7):
-        p, out = point_exterieur(k, z)
-        res.append((z, *chicot(g, p - out * 1.5, out)))
-    return res
-
-
-def plaque_soulevee(g, z, k):
-    """Lambeau d'écorce collé en bas, décollé et déchiqueté en haut."""
-    H, ouv = g.uniform(40, 75), g.uniform(0.45, 0.85)
-    r_in, ep = float(rayon_brin(k, z)) - 2.5, 1.8
-    axe = axe_brin(k, np.array([z - 1.0, z, z + 1.0]))
-    d = axe[2] - axe[0]
-    d /= np.linalg.norm(d)
-    u = np.cross(d, [0, 0, 1.0]); u /= np.linalg.norm(u)
-    v = np.cross(d, u)
-    cx, cy = centre_coeur(z)
-    out = np.array([axe[1][0] - cx, axe[1][1] - cy, 0.0])
-    al = math.atan2(out @ v, out @ u)                          # direction extérieure, repère local
-    coque = (Manifold.cylinder(H, r_in + ep, r_in + ep, 180)
-             - Manifold.cylinder(H + 2, r_in, r_in, 180).translate((0, 0, -1)))
-    coque = coque.trim_by_plane((-math.sin(al - ouv), math.cos(al - ouv), 0), 0)
-    coque = coque.trim_by_plane((math.sin(al + ouv), -math.cos(al + ouv), 0), 0)
-    phase = g.uniform(0, 6.3)
-
-    def deformer(pts):
-        x, y, zz = pts[:, 0], pts[:, 1], pts[:, 2]
-        a, r = np.arctan2(y, x), np.hypot(x, y)
-        t = np.clip(zz / H, 0, 1)
-        da = np.angle(np.exp(1j * (a - al))) / ouv
-        q = np.stack([r_in * np.cos(a) + 37 * k, r_in * np.sin(a), zz + z], -1)
-        r = r + 4.5 * t ** 1.6 + 2.5 * t * da ** 4 + 0.5 * ecorce(q)       # se décolle, bords roulés
-        zz = zz - 6 * t ** 6 * np.abs(np.sin(9 * da + phase))              # haut déchiqueté
-        return np.stack([r * np.cos(a), r * np.sin(a), zz], -1)
-
-    coque = coque.refine_to_length(1.2).warp_batch(deformer)
-    return coque.transform(np.column_stack([u, v, d, axe[1]]))
-
-
-def plaques_soulevees():
-    g = np.random.default_rng(GRAINE + 8)
-    return [(z, plaque_soulevee(g, z, k)) for z, k in emplacements(NB_PLAQUES, 10, 85, GRAINE + 9)]
-
-
-def veine() -> Manifold:
-    """Filon doré au fond du sillon entre deux brins."""
-    z = np.arange(25, Z_COL1 - 25, 1.0)
-    a = (angle_brin(0, z) + angle_brin(1, z)) / 2
-    cx, cy = centre_coeur(z)
-    rv = 3.4 + 1.0 * np.sin(z / 61 + 1) + 0.5 * np.sin(z / 23)
-    rc = rayon_coeur(z) - 0.6 * rv                        # affleure au fond du sillon
-    rv = rv * np.clip(np.minimum(z - 25, Z_COL1 - 25 - z) / 40, 0.15, 1)
-    return tube_balaye(np.stack([cx + rc * np.cos(a), cy + rc * np.sin(a), z], -1), rv, n=20)
+def medaillon():
+    z = POIGNEE[1] - 22
+    a = angle_liane(LIANES[0], z) + 2.0
+    r = float(rayon_fut(z)) + 4.0
+    p = np.array([r * math.cos(a), r * math.sin(a), z])
+    d = np.array([math.cos(a), math.sin(a), 0.0])
+    u = np.array([-math.sin(a), math.cos(a), 0.0])
+    plaque = Manifold.sphere(1.0, 48).scale((7, 9, 2.6))
+    anneau = Manifold.cylinder(1.4, 8.5, 8.5, 48).scale((1, 1.25, 1)) - Manifold.cylinder(3, 7, 7, 48).scale((1, 1.25, 1)).translate((0, 0, -1))
+    m = plaque + anneau.translate((0, 0, 0.6))
+    return m.transform(np.column_stack([u, np.array([0, 0, 1.0]), d, p]))
 
 
 # ---------------------------------------------------------------- CRISTAUX
@@ -398,75 +264,95 @@ def cristal(g, r, h, inclin, azim, base):
     bas = np.stack([rr * np.cos(a), rr * np.sin(a), np.full(6, -8.0)], 1)
     hh = h * (1 + g.uniform(-0.12, 0.05, 6))
     haut = np.stack([rr * np.cos(a) * 0.97, rr * np.sin(a) * 0.97, hh], 1)
-    pointe = [[g.uniform(-0.3, 0.3) * r, g.uniform(-0.3, 0.3) * r, h + r * g.uniform(1.3, 2.2)]]
+    pointe = [[g.uniform(-0.3, 0.3) * r, g.uniform(-0.3, 0.3) * r, h + r * g.uniform(1.4, 2.4)]]
     c = Manifold.hull_points(np.vstack([bas, haut, pointe]))
     return c.rotate((inclin, 0, 0)).rotate((0, 0, azim)).translate(tuple(base))
 
 
-def grappe(o) -> Manifold:
+def bouquet(o):
+    """Grand bouquet de cristaux, violets en majorité, quelques verts."""
     g = np.random.default_rng(GRAINE + 2)
-    pieces = [cylindre(24, 6, o[2] - 4, o[0], o[1]),                    # socle, laisse passer la lumière
-              cristal(g, 12, 62, 8, 30, o)]
-    for k in range(8):                                                  # grappe basse et serrée
-        a = 2 * math.pi * k / 8 + g.uniform(-0.25, 0.25)
-        d = g.uniform(7, 14)
-        pieces.append(cristal(g, g.uniform(4.5, 8), g.uniform(18, 42), g.uniform(15, 40),
-                              math.degrees(a) + 90, o + [d * math.cos(a), d * math.sin(a), 0]))
-    for k in range(30):                                                 # druse au pied
-        a = g.uniform(0, 2 * math.pi)
-        d = g.uniform(10, 22)
-        pieces.append(cristal(g, g.uniform(1.3, 3.0), g.uniform(3, 10), g.uniform(10, 50),
-                              math.degrees(a) + 90, o + [d * math.cos(a), d * math.sin(a), 1.5]))
-    return union(pieces)
+    violets = [cylindre(27, 6, o[2] - 4, o[0], o[1]), cristal(g, 14, 115, 4, 20, o)]
+    verts = []
+    couronnes = [(7, 8, 13, (8, 11), (60, 95), (8, 20), 0),
+                 (10, 18, 25, (6, 9), (40, 70), (22, 34), 4),
+                 (11, 24, 28, (4, 6.5), (22, 45), (35, 50), 10)]
+    for n, d0, d1, rr, hh, inc, dz in couronnes:
+        for k in range(n):
+            a = 2 * math.pi * k / n + g.uniform(-0.2, 0.2)
+            d = g.uniform(d0, d1)
+            c = cristal(g, g.uniform(*rr), g.uniform(*hh), g.uniform(*inc), math.degrees(a) + 90,
+                        np.array(o) + [d * math.cos(a), d * math.sin(a), dz])
+            (verts if g.uniform() < 0.3 else violets).append(c)
+    violets, verts = union(violets), union(verts)
+    return violets - verts, verts
+
+
+ECLATS = [(175, 0.4), (240, 2.6), (870, 4.4), (1475, 1.3)]
+
+
+def eclats():
+    """Petits cristaux violets sertis dans le fût, entre les lianes."""
+    g = np.random.default_rng(GRAINE + 5)
+    res = []
+    for z, a in ECLATS:
+        r0 = float(rayon_fut(z))
+        c = cristal(g, g.uniform(5.0, 6.5), g.uniform(16, 24), g.uniform(45, 60), 0, (0, 0, 0))
+        c = c.rotate((0, 0, math.degrees(a) + 90)).translate((r0 * 0.9 * math.cos(a), r0 * 0.9 * math.sin(a), z))
+        res.append((z, c))
+    return res
+
+
+def pendentif(g, r, h):
+    """Petit cristal à suspendre, percé en travers près de la base."""
+    c = cristal(g, r, h, 0, 0, (0, 0, 8))
+    trou = Manifold.cylinder(4 * r, 1.0, 1.0, 24).rotate((0, 90, 0)).translate((-2 * r, 0, 4))
+    return c - trou
 
 
 # ---------------------------------------------------------------- PIÈCES
-def avec_details(bois, z0, z1, details):
-    """Ajoute bosses et chicots, creuse les nœuds ; renvoie (bois, bois clair)."""
-    plus, moins, ch, lambeaux = details
-    sel = lambda lst: [m for z, m in lst if z0 <= z < z1]
-    bois = union([bois] + sel(plus) + sel(lambeaux) + [e for z, e, _ in ch if z0 <= z < z1])
-    for m in sel(moins):
-        bois = bois - m
-    clair = [c for z, _, c in ch if z0 <= z < z1]
-    if not clair:
-        return bois, None
-    clair = union(clair)
-    return bois - clair, clair
+def sertis(z0, z1, lian):
+    sel = [c for z, c in ECLATS_M if z0 <= z < z1]
+    return union(sel) if sel else None
 
 
-def segment_fut(i, filon, details):
+def segment_fut(i, extras):
     z0, z1 = i * H_SEG, (i + 1) * H_SEG
     alesage = cylindre(R_ALESAGE, H_SEG + 2, z0 - 1)
-    bois, clair = avec_details(tronc(z0, z1), z0, z1, details)
-    bois = (bois ^ tranche(z0, z1)) - alesage
-    return bois - filon, (filon ^ tranche(z0, z1)) - alesage, clair
+    bois, lian = fut(z0, z1), lianes(z0, z1)
+    cuir_s = None
+    if POIGNEE[0] < z1 and POIGNEE[1] > z0:
+        cuir_s = extras["cuir"] + extras["medaillon"]
+        lian = lian - cuir_s                                       # les lianes passent sous le cuir
+        cuir_s = cuir_s - extras["medaillon"]
+        lian = lian + extras["medaillon"]
+    cr = sertis(z0, z1, lian)
+    lian = lian - cr if cr else lian                                # les éclats passent devant
+    bois = bois - lian - (cuir_s if cuir_s else Manifold()) - (cr if cr else Manifold())
+    return bois - alesage, lian - alesage, cuir_s, cr
 
 
-def trous_goupilles():
-    """2 trous Ø3,2 pour goupiller la main sur le col (clous ou vis M3)."""
-    cx, cy = centre_coeur(Z_COL1)
+def trous_vis():
+    """2 trous Ø3,2 pour bloquer le bouquet sur le col (vis à bois 3,5 mm)."""
     trous = []
     for a in (20, 200):
         c = Manifold.cylinder(30, 1.6, 1.6, 24).rotate((0, 90, 0)).translate((R_TENON - 10, 0, 0))
-        trous.append(c.rotate((0, 0, a)).translate((float(cx), float(cy), Z_COL1 + H_TENON / 2)))
+        trous.append(c.rotate((0, 0, a)).translate((0, 0, Z_COL1 + H_TENON / 2)))
     return trous[0] + trous[1]
 
 
-def col(filon, details):
-    cx, cy = (float(v) for v in centre_coeur(Z_COL1))
-    bois, clair = avec_details(tronc(Z_COL0, Z_COL1), Z_COL0, Z_COL1, details)
-    bois = bois ^ tranche(Z_COL0, Z_COL1)
-    bois = bois - cylindre(R_ALESAGE, PROF_DOUILLE + 1, Z_COL0 - 1)               # douille
-    bois = bois + cylindre(R_TENON, H_TENON + 1, Z_COL1 - 1, cx, cy)              # tenon
-    bois = bois - cylindre(DIAM_LED / 2, 23, Z_COL1 + H_TENON - 22, cx, cy)       # logement bougie
-    bois = bois - trous_goupilles()
-    v = (filon ^ tranche(Z_COL0, Z_COL1)) - cylindre(R_ALESAGE, PROF_DOUILLE + 1, Z_COL0 - 1)
-    return bois - filon, v, clair
+def col():
+    bois, lian = fut(Z_COL0, Z_COL1), lianes(Z_COL0, Z_COL1)
+    cr = sertis(Z_COL0, Z_COL1, lian)
+    lian = lian - cr if cr else lian
+    bois = bois - lian - (cr if cr else Manifold())
+    bois = bois - cylindre(R_ALESAGE, PROF_DOUILLE + 1, Z_COL0 - 1)                # douille
+    bois = bois + cylindre(R_TENON, H_TENON + 1, Z_COL1 - 1)                      # tenon
+    bois = bois - cylindre(DIAM_LED / 2, 23, Z_COL1 + H_TENON - 22)               # logement bougie
+    return bois - trous_vis(), lian, cr
 
 
 def coudes(g, n, amp):
-    """Bruit par morceaux : donne au bois des coudes au lieu de courbes trop lisses."""
     cles = np.linspace(0, 1, 7)
     s = np.linspace(0, 1, n)
     dev = np.stack([np.interp(s, cles, g.uniform(-1, 1, 7)) for _ in range(3)], -1)
@@ -475,76 +361,37 @@ def coudes(g, n, amp):
     return dev * amp * s[:, None]
 
 
-def branche(g, pts, r0, r1, aplat=0.8):
-    s = np.linspace(0, 1, len(pts))
-    r = r0 * (1 - s) ** 0.75 + r1
-    for pos in g.uniform(0.2, 0.85, 3):                                   # nœuds
-        r = r + 0.25 * r0 * np.exp(-((s - pos) / 0.035) ** 2) * (1 - 0.6 * s)
-    return tube_balaye(pts, r, n=96, texture=np.clip(r / 9, 0.15, 1), aplat=aplat), r
-
-
-def griffe(g, cx, cy, a0, e0, z0, L, ecarte, crochet, vrille):
-    n = int(L / PAS)
-    s = np.linspace(0, 1, n)
-    rad = e0 + ecarte * np.sin(math.pi * s * 0.7) - crochet * s ** 3
-    z = z0 + L * 0.8 * (s - 0.25 * s ** 3)
-    tw = a0 + vrille * s
-    pts = np.stack([cx + rad * np.cos(tw), cy + rad * np.sin(tw), z], -1)
-    return pts + coudes(g, n, 9.0)
-
-
-def rameau(g, pts, r, s0):
-    """Petite branche qui part d'une griffe et se recourbe."""
-    i = int(s0 * len(pts))
-    t = pts[min(i + 1, len(pts) - 1)] - pts[i - 1]
-    t /= np.linalg.norm(t)
-    lat = np.cross(t, g.normal(size=3))
-    lat /= np.linalg.norm(lat)
-    L = g.uniform(40, 80)
-    n = int(L / PAS)
-    s = np.linspace(0, 1, n)[:, None]
-    d0 = 0.5 * t + 0.85 * lat
-    chemin = pts[i] + L * (s * d0 + 0.6 * s ** 2 * (t - 0.4 * lat)) + coudes(g, n, 5.0)
-    return branche(g, chemin, 0.5 * r[i], 1.1)[0]
-
-
-def main_griffue():
-    """Le bois du tronc se prolonge en 3 grosses griffes coudées, crochues à l'arrière,
-    avec des rameaux ; 6 racines plus fines enveloppent la base et montent entre les cristaux."""
-    cx, cy = (float(v) for v in centre_coeur(Z_COL1))
+def tete():
+    """Base en bois + les lianes qui s'ouvrent et s'entrelacent dans le bouquet."""
     zs = np.linspace(Z_COL1, Z_COL1 + HP, int(HP / PAS) + 1)
-    th = np.linspace(0, 2 * math.pi, 240, endpoint=False)
+    th = np.linspace(0, 2 * math.pi, 200, endpoint=False)
     Z, TH = np.meshgrid(zs, th, indexing="ij")
-    R = rayon_coeur(Z_COL1) - 1 + 0 * Z
-    levre = 5 + 10 * np.abs(np.sin(3 * TH + 1.1)) + 3 * np.sin(7 * TH + 0.4)   # le bois monte autour des cristaux
-    Zl = Z + lisse((Z - (Z_COL1 + HP - 15)) / 15) * levre
-    paume = loft(texturer(np.stack([cx + R * np.cos(TH), cy + R * np.sin(TH), Zl], -1)))
+    R = R_TETE + 0 * Z
+    base = loft(texturer(np.stack([R * np.cos(TH), R * np.sin(TH), Z], -1), grain_bois))
 
     g = np.random.default_rng(GRAINE + 3)
-    dos = math.atan2(-cy, -cx) if abs(cx) + abs(cy) > 1 else 0.0       # côté opposé à la pente
-    bois = [paume]
-    e0 = float(ecart_brins(Z_COL1))
-    for k in range(3):                                                  # grosses griffes
-        a0 = float(angle_brin(k, Z_COL1))
-        arr = max(0.0, math.cos(a0 - dos))
-        pts = griffe(g, cx, cy, a0, e0, Z_COL1 - 20, 230 + 90 * arr + g.uniform(-15, 15),
-                     g.uniform(18, 26), 28 + 50 * arr, g.uniform(0.4, 0.8) * (1 if k % 2 else -1))
-        tube, r = branche(g, pts, RAYON_BRIN + 3, 2.0, aplat=0.75)
-        bois.append(tube)
-        for s0 in g.uniform(0.35, 0.65, 1 + int(arr > 0.3)):
-            bois.append(rameau(g, pts, r, s0))
-    for k in range(6):                                                  # racines qui enveloppent
-        a0 = float(angle_brin(0, Z_COL1)) + math.pi / 3 * (k + 0.5) + g.uniform(-0.2, 0.2)
-        pts = griffe(g, cx, cy, a0, float(R[0, 0]) + 1, Z_COL1 - 10, g.uniform(130, 190),
-                     g.uniform(6, 14), g.uniform(14, 24), g.uniform(-0.9, 0.9))
-        bois.append(branche(g, pts, g.uniform(9, 13), 1.6, aplat=0.7)[0])
+    branches = []
+    for L in LIANES * 2:                                          # chaque liane se dédouble
+        a0 = float(angle_liane(L, Z_COL1)) + g.uniform(-0.4, 0.4)
+        r0 = float(orbite_liane(L, Z_COL1))
+        long = g.uniform(170, 260)
+        n = int(long / PAS)
+        s = np.linspace(0, 1, n)
+        rad = r0 + g.uniform(18, 42) * np.sin(math.pi * s * 0.8) - g.uniform(5, 25) * s ** 3
+        z = Z_COL1 - 10 + long * 0.9 * s
+        tw = a0 + L["sens"] * g.uniform(0.6, 1.6) * s
+        pts = np.stack([rad * np.cos(tw), rad * np.sin(tw), z], -1) + coudes(g, n, 4.0)
+        rv = float(rayon_liane(L, Z_COL1)) * (0.85 - 0.6 * s) + 0.7
+        branches.append(tube_balaye(pts, rv, n=32, texture=np.clip(rv / 5, 0.2, 0.6)))
+    lian = union(branches) ^ tranche(Z_COL1, Z_COL1 + 500)
 
-    main = union(bois) ^ tranche(Z_COL1, Z_COL1 + 500)
-    main = main - cylindre(R_TENON + JEU / 2, H_TENON, Z_COL1 - 1, cx, cy)        # mortaise
-    main = main - cylindre(DIAM_LED / 2, HP + 40, Z_COL1, cx, cy)                 # chambre de lumière
-    main = main - trous_goupilles()
-    cr = grappe(np.array([cx, cy, Z_COL1 + HP])) - main                  # le bois recouvre les cristaux
-    return main, cr
+    bois = base - cylindre(R_TENON + JEU / 2, H_TENON, Z_COL1 - 1)               # mortaise
+    bois = bois - cylindre(DIAM_LED / 2, HP + 40, Z_COL1)                         # chambre de lumière
+    bois = bois - trous_vis() - lian
+    lian = lian - trous_vis() - cylindre(R_TENON + JEU / 2, H_TENON, Z_COL1 - 1)
+    violets, verts = bouquet(np.array([0.0, 0.0, Z_COL1 + HP]))
+    violets, verts = violets - lian - bois, verts - lian - bois
+    return bois, lian, violets, verts
 
 
 # ---------------------------------------------------------------- MAIN
@@ -554,43 +401,54 @@ def exporter(man, nom, z):
     assert m.is_watertight, f"{nom} : maillage non étanche"
     m.apply_translation((0, 0, -z))
     m.export(SORTIE / "stl" / nom)
-    print(f"{nom:28s} {m.extents.round(0)} mm  {m.volume / 1000:5.0f} cm3  {len(m.faces):7d} tri")
+    print(f"{nom:32s} {m.extents.round(0)} mm  {m.volume / 1000:5.0f} cm3  {len(m.faces):7d} tri")
     return m.apply_translation((0, 0, z))
 
 
-def verifier_paroi(bois, z0, z1):
+def verifier_paroi(solide, z0, z1):
     anneau = cylindre(R_ALESAGE + PAROI_MIN - 0.5, z1 - z0, z0) - cylindre(R_ALESAGE + 0.01, z1 - z0 + 2, z0 - 1)
-    manque = (anneau - bois).volume()
+    manque = (anneau - solide).volume()
     assert manque < 1.0, f"paroi trop fine entre z={z0} et {z1} ({manque:.1f} mm3 manquants)"
 
+
+ECLATS_M = eclats()
 
 if __name__ == "__main__":
     (SORTIE / "stl").mkdir(exist_ok=True)
     for f in (SORTIE / "stl").glob("*.stl"):
         f.unlink()
-    filon = veine()
-    details = (*noeuds_creux(), chicots(), plaques_soulevees())
-    rendu = {"bois": [], "veine": [], "cristaux": [], "clair": []}
+    extras = {"cuir": cuir(), "medaillon": medaillon()}
+    rendu = {k: [] for k in ("bois", "lianes", "cuir", "violet", "vert")}
     for i in range(NB_SEGMENTS):
-        bois, v, clair = segment_fut(i, filon, details)
-        verifier_paroi(bois + v, i * H_SEG, (i + 1) * H_SEG)       # la veine compte dans la paroi
-        rendu["bois"].append(exporter(bois, f"fut_{i + 1}_ecorce.stl", i * H_SEG))
-        rendu["veine"].append(exporter(v, f"fut_{i + 1}_veine.stl", i * H_SEG))
-        if clair:
-            rendu["clair"].append(exporter(clair, f"fut_{i + 1}_bois_clair.stl", i * H_SEG))
+        bois, lian, cuir_s, cr = segment_fut(i, extras)
+        verifier_paroi(union([bois, lian, cuir_s, cr]), i * H_SEG, (i + 1) * H_SEG)
+        rendu["bois"].append(exporter(bois, f"fut_{i + 1}_bois.stl", i * H_SEG))
+        rendu["lianes"].append(exporter(lian, f"fut_{i + 1}_lianes.stl", i * H_SEG))
+        if cuir_s:
+            rendu["cuir"].append(exporter(cuir_s, f"fut_{i + 1}_cuir.stl", i * H_SEG))
+        if cr:
+            rendu["violet"].append(exporter(cr, f"fut_{i + 1}_cristaux_violets.stl", i * H_SEG))
 
-    bois, v, clair = col(filon, details)
-    verifier_paroi(bois + v, Z_COL0, Z_COL0 + PROF_DOUILLE)
-    rendu["bois"].append(exporter(bois, "tete_1_col_ecorce.stl", Z_COL0))
-    rendu["veine"].append(exporter(v, "tete_1_col_veine.stl", Z_COL0))
-    if clair:
-        rendu["clair"].append(exporter(clair, "tete_1_col_bois_clair.stl", Z_COL0))
+    bois, lian, cr = col()
+    verifier_paroi(union([bois, lian, cr]), Z_COL0, Z_COL0 + PROF_DOUILLE)
+    rendu["bois"].append(exporter(bois, "tete_1_col_bois.stl", Z_COL0))
+    rendu["lianes"].append(exporter(lian, "tete_1_col_lianes.stl", Z_COL0))
+    if cr:
+        rendu["violet"].append(exporter(cr, "tete_1_col_cristaux_violets.stl", Z_COL0))
 
-    main, cr = main_griffue()
-    rendu["bois"].append(exporter(main, "tete_2_main_ecorce.stl", Z_COL1))
-    rendu["cristaux"].append(exporter(cr, "tete_2_main_cristaux.stl", Z_COL1))
+    bois, lian, violets, verts = tete()
+    rendu["bois"].append(exporter(bois, "tete_2_bouquet_bois.stl", Z_COL1))
+    rendu["lianes"].append(exporter(lian, "tete_2_bouquet_lianes.stl", Z_COL1))
+    rendu["violet"].append(exporter(violets, "tete_2_bouquet_cristaux_violets.stl", Z_COL1))
+    rendu["vert"].append(exporter(verts, "tete_2_bouquet_cristaux_verts.stl", Z_COL1))
+
+    g = np.random.default_rng(GRAINE + 4)
+    pend = [pendentif(g, 3.5, 16).translate((0, 0, 0)), pendentif(g, 3.0, 13).translate((15, 0, 0))]
+    exporter(pend[0] + pend[1], "pendentifs_violets.stl", 0)
+    exporter(pendentif(g, 3.2, 14), "pendentif_vert.stl", 0)
 
     # assemblage complet pour les aperçus (non versionné)
     (SORTIE / "apercu").mkdir(exist_ok=True)
     for cle, morceaux in rendu.items():
-        trimesh.util.concatenate(morceaux).export(SORTIE / "apercu" / f"assemblage_{cle}.stl")
+        if morceaux:
+            trimesh.util.concatenate(morceaux).export(SORTIE / "apercu" / f"assemblage_{cle}.stl")

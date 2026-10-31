@@ -1,105 +1,106 @@
 # Bâton de la Guggen
 
-Bâton d'environ **1,95 m** façon tronc d'arbre tordu d'Halloween : trois brins de bois
-enroulés, écorce épaisse aux sillons profonds, lambeaux d'écorce soulevés, nœuds creux,
-branches cassées, une veine dorée au fond d'un sillon. En haut, le col se cambre en S et le
-bois se prolonge en grosses griffes coudées, avec des rameaux et des racines qui enveloppent
-des cristaux éclairés par une bougie LED orange.
-Conçu pour une **Prusa XL multi-têtes** (plateau 360 × 360 × 360 mm).
+Bâton d'environ **1,82 m** : un fût droit en bois sombre, enlacé de lianes qui se croisent
+et s'évasent en racines au pied, une poignée en cuir enroulé avec un médaillon, des éclats
+de cristal sertis, et en haut un bouquet de cristaux violets et verts tenu par les lianes,
+éclairé par une bougie LED. Conçu pour une **Prusa XL 5 têtes** (plateau 360 × 360 × 360 mm).
 
-| Tête | Écorce | Bâton complet |
-|---|---|---|
-| ![Tête](apercu/tete.png) | ![Écorce](apercu/ecorce_detail.png) | ![Bâton](apercu/baton_complet.png) |
+| Tête | Poignée | Pied | Bâton complet |
+|---|---|---|---|
+| ![Tête](apercu/tete.png) | ![Poignée](apercu/poignee.png) | ![Pied](apercu/ecorce_detail.png) | ![Bâton](apercu/baton_complet.png) |
 
 ## Principe
 
-- Un **tube alu (ou fibre de verre) Ø16 mm** passe à l'intérieur et donne la solidité.
-  Les tronçons imprimés s'enfilent dessus et se collent. Un bâton tout en plastique
-  casserait au premier choc.
-- Autour du tube, un cœur (paroi d'au moins 3,5 mm, vérifiée par le script) et trois brins
-  qui s'enroulent d'un tour tous les 33 cm, avec un pied évasé comme des racines.
-- L'écorce est en vrai relief : plaques qui ressortent de 1 à 2 mm, sillons de près de 4 mm,
-  cassures en travers et gerçures fines. Elle est continue d'un tronçon à l'autre.
-- **12 lambeaux d'écorce soulevés** : collés en bas, décollés de 4 à 5 mm et déchiquetés en haut.
-  Ils montent en s'écartant légèrement, donc s'impriment sans support.
-- **9 nœuds creux** et **8 gros départs de branches** (Ø 2 à 3 cm, gros bourrelet) cassés en éclats,
-  avec les cernes du bois visibles au bout.
-- En haut, pas de « coupe » : 3 grosses griffes (la suite des 3 brins), coudées et à section
-  aplatie comme du vrai bois, crochues à l'arrière, avec des rameaux ; 6 racines enveloppent
-  la base et le bois remonte en lèvre irrégulière autour des cristaux.
-- Les **cristaux** sont bas et serrés, et c'est le bois qui les recouvre : on n'en voit que
-  des morceaux entre les racines, comme sur la photo.
-  Elles pointent vers le haut (42 à 60°) pour s'imprimer sans support. Le bout éclaté
-  (bois clair et échardes) est une pièce séparée, à imprimer dans une 4e couleur.
-- La **veine dorée** est une pièce séparée, logée au fond du sillon entre deux brins : à imprimer
-  dans une 2e couleur (PLA soie or ou cuivre).
-- Les cristaux sont imprimés en même temps que la main, dans une 3e couleur : ils sont pris
-  dans le bois et ne s'enlèvent pas.
-- La bougie LED se loge dans le haut du col. On retire la main pour l'allumer.
+- Un **tube alu Ø16 mm** passe à l'intérieur et donne la solidité. Les tronçons imprimés
+  s'enfilent dessus et se collent. Paroi d'au moins 3,5 mm autour du tube, vérifiée par le script.
+- **Fût en bois sombre** Ø30 mm, veiné de longues fentes fines.
+- **14 lianes** (dont 3 épaisses) s'enroulent dans les deux sens, se croisent, se décollent
+  par endroits, et s'évasent en racines au pied. Elles plongent sous la poignée et ressortent.
+- **Poignée en cuir** (230 mm) : lanière enroulée en hélice, chaque tour recouvrant le précédent,
+  avec un médaillon ovale (couleur des lianes).
+- **4 éclats de cristal violet** sertis dans le fût.
+- **Bouquet** : 30 cristaux (un grand central de 14 cm, trois couronnes de plus en plus inclinées),
+  70 % violets et 30 % verts. Chaque liane se dédouble en haut et s'entrelace entre les cristaux.
+- **Bougie LED** logée en haut du col, sous les cristaux. Le bouquet s'emboîte sur le col et se
+  bloque avec 2 vis.
+- **3 pendentifs** (2 violets, 1 vert), percés pour une cordelette, à nouer à la poignée.
 
-## Fichiers (`stl/`) et filaments
+## Têtes et filaments
 
-Chaque pièce multi-couleur = plusieurs STL à charger **ensemble** dans PrusaSlicer.
+| Tête | Filament | Pour |
+|---|---|---|
+| T1 | PLA brun très foncé / brun-noir mat | Fût en bois |
+| T2 | PLA brun moyen, idéalement soie bronze ou cuivre | Lianes et médaillon |
+| T3 | PLA ou PETG **translucide violet** | Cristaux violets |
+| T4 | PLA ou PETG **translucide vert** | Cristaux verts |
+| T5 | PLA noir ou brun foncé mat | Cuir de la poignée |
 
-| Tête | Filament |
-|---|---|
-| T1 | PLA brun écorce (brun chocolat / « tree brown ») |
-| T2 | PLA soie or ou cuivre (veine) |
-| T3 | PLA translucide ambre ou fumé (cristaux) : plus discret et plus proche de la photo que l'orange vif |
-| T4 | PLA beige / bois clair (bouts des branches cassées). Un PLA chargé bois va aussi, mais avec une buse de 0,6 mm |
+## Fichiers (`stl/`)
 
-| Pièce | Fichiers | Taille (mm) | Outils |
+Chaque pièce = plusieurs STL à charger **ensemble** dans PrusaSlicer (même origine, rien à aligner).
+
+| Pièce | Fichiers | Taille (mm) | Têtes |
 |---|---|---|---|
-| Fût 1 à 4 (1 = pied) | `fut_N_ecorce.stl` + `fut_N_veine.stl` (+ `fut_N_bois_clair.stl`) | ~75-100 × 75 × 350 | T1, T2, T4 |
-| Col en S | `tete_1_col_ecorce.stl` + `tete_1_col_veine.stl` + `tete_1_col_bois_clair.stl` | ~119 × 118 × 325 | T1, T2, T4 |
-| Griffes + cristaux | `tete_2_main_ecorce.stl` + `tete_2_main_cristaux.stl` | ~106 × 129 × 167 | T1, T3 translucide |
-
-Le tronçon 2 n'a pas de branche cassée : pas de fichier `bois_clair` pour lui.
-
-Dans PrusaSlicer : sélectionner les 2 ou 3 fichiers d'une pièce, les glisser ensemble, répondre
-**Oui** à « charger comme un seul objet à plusieurs parties », puis attribuer un extrudeur à
-chaque partie. Les fichiers partagent la même origine : rien à aligner.
+| Fût 1 (pied) | `fut_1_bois` + `fut_1_lianes` + `fut_1_cristaux_violets` | 81 × 77 × 350 | T1, T2, T3 |
+| Fût 2 | `fut_2_bois` + `fut_2_lianes` | 48 × 47 × 350 | T1, T2 |
+| Fût 3 | `fut_3_bois` + `fut_3_lianes` + `fut_3_cristaux_violets` | 47 × 45 × 350 | T1, T2, T3 |
+| Fût 4 (poignée) | `fut_4_bois` + `fut_4_lianes` + `fut_4_cuir` | 49 × 46 × 350 | T1, T2, T5 |
+| Col | `tete_1_col_bois` + `tete_1_col_lianes` + `tete_1_col_cristaux_violets` | 64 × 70 × 185 | T1, T2, T3 |
+| Bouquet | `tete_2_bouquet_bois` + `_lianes` + `_cristaux_violets` + `_cristaux_verts` | 130 × 134 × 223 | T1, T2, T3, T4 |
+| Pendentifs | `pendentifs_violets` (2) et `pendentif_vert` | petits | T3, T4 |
 
 ## À acheter
 
-- Tube alu rond Ø16 mm, longueur **1,52 m** (1400 mm de fût + 120 mm dans le col)
-- 1 bougie LED « chauffe-plat » orange vacillante (Ø38 mm max)
-- 2 clous ou vis M3 × 15 mm pour goupiller la main sur le col
-- Colle époxy, peinture (voir finition)
-- Embout caoutchouc Ø16 mm pour le pied (facultatif)
+| Article | Quantité |
+|---|---|
+| PLA brun très foncé (T1) | 1 bobine de 1 kg (~0,6 kg utilisés) |
+| PLA brun / soie bronze (T2) | 1 bobine de 1 kg (~0,7 kg utilisés) |
+| Translucide violet (T3) | 1 bobine (~120 g utilisés) |
+| Translucide vert (T4) | 1 petite bobine ou un reste (~50 g) |
+| PLA noir ou brun foncé mat (T5) | un reste ou 1 petite bobine (~150 g) |
+| Tube alu rond Ø16 mm, paroi 1 mm | 1 barre de 2 m, à recouper à **1,52 m** |
+| Bougie LED chauffe-plat Ø38 mm max, **blanche ou RGB avec télécommande** | 1 lot (une orange rendrait les cristaux violets ternes) |
+| Vis à bois / aggloméré 3,5 × 20 mm | 2 |
+| Colle époxy 2 composants rapide | 2 tubes |
+| Cordelette cuir ou cirée Ø1 à 1,5 mm | 1 m (pour les pendentifs) |
+| Patin caoutchouc adhésif Ø40-50 mm | 1 (sous le pied) |
+| Facultatif : jus brun-noir + vernis mat | pour faire ressortir le relief |
 
-## Impression
+## Réglages PrusaSlicer (Prusa XL 5T, buses 0,4 mm)
 
-- Fût et col : debout, 3 parois, 10 % de remplissage gyroïde, sans support.
-  Buse 0,4 mm, couches 0,15 à 0,2 mm. Les lambeaux soulevés font 1,8 mm d'épaisseur :
-  garder 2 parois minimum pour qu'ils soient pleins.
-- Col : debout, supports organiques sous le ventre du S.
-- Griffes : debout, **supports organiques** sous les griffes.
-- Cristaux : réglage de pièce dans PrusaSlicer, 2 parois et 0 % de remplissage pour qu'ils
-  restent bien translucides.
-- Estimation : ~1,2 à 1,5 kg de filament noir, ~100 g d'or, ~60 g de translucide.
-  Compter **60 à 90 h** d'impression au total. Le poids final du bâton est d'environ 1,6 à 1,9 kg.
+- Charger les fichiers d'une pièce **ensemble** → « Oui » à « objet à plusieurs parties »
+  → attribuer chaque partie à sa tête. Ne pas redimensionner ni tourner.
+- Couches **0,20 mm** pour le fût et le col, **0,15 mm** pour le bouquet.
+- **3 périmètres**, 4 couches pleines dessus/dessous, **gyroïde 10 %**.
+- Jointure **alignée**. **Bordure (brim) 8 mm** : les tronçons font 35 cm de haut.
+- Tour de nettoyage activée, avec sa bordure.
+- **Supports organiques** :
+  - fût et col : depuis le plateau seulement (le bas des racines et quelques lianes décollées) ;
+  - bouquet : **partout** (les lianes du haut se recourbent au-dessus du vide) ;
+  - supports et interface en T1, espace en Z 0,2 mm.
+- **Cristaux** (réglage par partie) : 2 périmètres, **0 % de remplissage** pour qu'ils restent
+  creux et laissent passer la lumière.
+- Pendentifs : debout, base en bas, sans support (le trou de 2 mm passe en pont).
+- Estimation : **~60 à 80 h** d'impression au total. Poids du bâton ≈ 1,5 kg avec le tube.
 
 ## Montage
 
-1. Enfiler les tronçons sur le tube du pied (`fut_1`) au haut (`fut_4`), en collant chaque
-   jointure à l'époxy. Tourner chaque tronçon jusqu'à ce que la veine et l'écorce se raccordent.
-2. Emboîter le col sur le haut du tube (douille de 120 mm), coller.
-3. Poser la bougie dans le logement en haut du col, emboîter la main, et la goupiller avec
-   les 2 clous ou vis M3 dans les trous latéraux (ne pas coller : il faut pouvoir l'ouvrir).
+1. Couper le tube à 1,52 m, ébavurer.
+2. Enfiler les tronçons du pied (`fut_1`) au haut (`fut_4`), en collant chaque jointure à l'époxy,
+   et tourner chaque tronçon jusqu'à ce que les lianes se raccordent.
+3. Emboîter le col sur le haut du tube (douille de 120 mm), coller.
+4. Poser la bougie dans le logement en haut du col, emboîter le bouquet, visser les 2 vis
+   dans les trous latéraux (ne pas coller : il faut pouvoir changer la pile).
+5. Nouer les pendentifs à la poignée avec la cordelette.
 
 ## Finition
 
-Imprimée en brun, l'écorce est déjà crédible. Pour un vrai rendu d'arbre : un jus brun très
-foncé dans les sillons, essuyé tout de suite, puis un brossage à sec beige-gris sur les reliefs.
-Vernis mat par-dessus, en masquant la veine, les bouts cassés et les cristaux.
-
-Les départs de branches dépassent de 2 à 4 cm : en cortège, elles peuvent accrocher un costume
-ou casser sur un choc. Elles sont pleines et ancrées dans le tronc, mais si l'une casse, un
-point de colle époxy suffit.
+Un jus brun-noir très dilué sur le fût et les lianes, essuyé tout de suite, fait ressortir
+les fentes et l'écorce. Un brossage à sec léger (beige-gris) sur les lianes. Vernis mat,
+en masquant les cristaux.
 
 ## Modifier le bâton
 
 Tout est généré par `generer_baton.py` (Python 3, `pip install numpy scipy trimesh manifold3d`).
-Les cotes sont en haut du fichier : longueur, nombre de tronçons, diamètre du tube, ondulation,
-épaisseur de paroi. Change `GRAINE` pour obtenir un autre bâton (noeuds, doigts, cristaux).
+Les réglages sont en haut du fichier : longueur, diamètre du tube et du fût, nombre de lianes,
+position de la poignée. Change `GRAINE` pour obtenir un autre bâton.
