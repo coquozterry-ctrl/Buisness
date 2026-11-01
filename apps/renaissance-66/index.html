@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f1115">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Renaissance 66</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<style>
+:root{
+  --bg:#0f1115; --card:#181b22; --card2:#20242d; --line:#2a2f3a;
+  --text:#eef0f4; --muted:#9097a6; --accent:#f5a623; --accent2:#ffcf70;
+  --ok:#3ecf8e; --bad:#ff5d5d; --radius:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body{padding:calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 90px);max-width:560px;margin:0 auto;-webkit-tap-highlight-color:transparent}
+h1{font-size:1.5rem}h2{font-size:1.05rem;margin-bottom:10px}
+.muted{color:var(--muted);font-size:.9rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+.row{display:flex;align-items:center;gap:12px}
+.between{justify-content:space-between}
+button{font:inherit;color:inherit;border:0;cursor:pointer;background:none}
+.btn{background:var(--accent);color:#1a1300;font-weight:700;padding:12px 18px;border-radius:12px;width:100%}
+.btn.ghost{background:var(--card2);color:var(--text);font-weight:600}
+.btn.danger{background:transparent;border:1px solid var(--bad);color:var(--bad)}
+input,select{font:inherit;color:var(--text);background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:11px 12px;width:100%}
+label{display:block;margin:12px 0 6px;font-size:.9rem;color:var(--muted)}
+.bar{height:10px;background:var(--card2);border-radius:99px;overflow:hidden}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:99px;transition:width .4s}
+.lvl{font-size:2.2rem;font-weight:800;color:var(--accent)}
+.quest{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:var(--card2);margin-bottom:8px;width:100%;text-align:left}
+.quest .ic{font-size:1.4rem;width:32px;text-align:center}
+.quest .chk{margin-left:auto;width:26px;height:26px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;flex:none}
+.quest.done{opacity:.6}.quest.done .t{text-decoration:line-through}
+.quest.done .chk{background:var(--ok);border-color:var(--ok);color:#06210f}
+.attrs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.attr{background:var(--card2);border-radius:12px;padding:10px 12px}
+.attr b{font-size:1.2rem}
+.grid66{display:grid;grid-template-columns:repeat(11,1fr);gap:5px}
+.grid66 span{aspect-ratio:1;border-radius:5px;background:var(--card2)}
+.grid66 .ok{background:var(--ok)}.grid66 .part{background:#2f6b52}.grid66 .ko{background:var(--bad)}.grid66 .today{outline:2px solid var(--accent)}
+nav{position:fixed;left:0;right:0;bottom:0;background:rgba(15,17,21,.95);backdrop-filter:blur(8px);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;max-width:140px;padding:10px 0 12px;font-size:.75rem;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px}
+nav button span{font-size:1.3rem}
+nav button.on{color:var(--accent)}
+.timer{font-size:4rem;font-weight:800;text-align:center;font-variant-numeric:tabular-nums;margin:10px 0}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:8px 12px;border-radius:99px;background:var(--card2);border:1px solid var(--line);font-size:.9rem}
+.chip.on{border-color:var(--accent);color:var(--accent2)}
+.toast{position:fixed;left:50%;top:20px;transform:translateX(-50%);background:var(--accent);color:#1a1300;font-weight:700;padding:10px 16px;border-radius:12px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9}
+.toast.show{opacity:1}
+.del{color:var(--bad);font-size:1.2rem;padding:4px 8px}
+.hidden{display:none!important}
+.stack>*+*{margin-top:10px}
+</style>
+</head>
+<body>
+<div id="toast" class="toast"></div>
+<main id="app"></main>
+<nav id="nav" class="hidden">
+  <button data-tab="jour" class="on"><span>⚔️</span>Quêtes</button>
+  <button data-tab="stats"><span>📈</span>Progrès</button>
+  <button data-tab="focus"><span>⏱️</span>Focus</button>
+  <button data-tab="reglages"><span>⚙️</span>Réglages</button>
+</nav>
+
+<script>
+"use strict";
+/* ---------- Données de base ---------- */
+const DUREE = 66;
+const ATTRS = {
+  force:      {nom:"Force",      ic:"💪"},
+  esprit:     {nom:"Esprit",     ic:"🧠"},
+  discipline: {nom:"Discipline", ic:"🛡️"},
+  serenite:   {nom:"Sérénité",   ic:"🧘"}
+};
+const PRESETS = [
+  {ic:"🏃", nom:"30 min de sport",          attr:"force"},
+  {ic:"💧", nom:"Boire 2 L d'eau",           attr:"force"},
+  {ic:"🥗", nom:"Manger sain, zéro sucre",   attr:"force"},
+  {ic:"📖", nom:"Lire 10 pages",             attr:"esprit"},
+  {ic:"🎓", nom:"Apprendre 20 min",          attr:"esprit"},
+  {ic:"⏰", nom:"Lever avant 7 h",           attr:"discipline"},
+  {ic:"📵", nom:"Moins de 2 h d'écran loisir",attr:"discipline"},
+  {ic:"🛏️", nom:"Coucher avant 23 h",        attr:"discipline"},
+  {ic:"🧘", nom:"10 min de méditation",      attr:"serenite"},
+  {ic:"✍️", nom:"Écrire 3 gratitudes",       attr:"serenite"},
+  {ic:"🚶", nom:"Marcher dehors 20 min",     attr:"serenite"}
+];
+const XP_QUETE = 10, XP_BONUS_JOUR = 20, XP_FOCUS = 15, XP_PENALITE = 50;
+const SEUIL_REUSSITE_NORMAL = 0.8; // 80 % des quêtes = journée réussie en mode normal
+
+/* ---------- Stockage ---------- */
+const CLE = "renaissance66";
+let S = charger();
+function charger(){
+  try { const v = JSON.parse(localStorage.getItem(CLE)); if (v && v.habits) return v; } catch(e){}
+  return null;
+}
+function sauver(){ try { localStorage.setItem(CLE, JSON.stringify(S)); } catch(e){ toast("Sauvegarde impossible sur cet appareil"); } }
+
+/* ---------- Dates (en heure locale) ---------- */
+const pad = n => String(n).padStart(2,"0");
+const cleDate = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const versDate = k => { const [y,m,d] = k.split("-").map(Number); return new Date(y, m-1, d); };
+const ajouterJours = (k, n) => { const d = versDate(k); d.setDate(d.getDate()+n); return cleDate(d); };
+const aujourdHui = () => cleDate(new Date());
+const ecartJours = (a, b) => Math.round((versDate(b) - versDate(a)) / 86400000);
+
+/* ---------- Calculs (tout est recalculé depuis l'historique) ---------- */
+function tauxJour(k){
+  const faits = (S.log[k] || []).filter(id => S.habits.some(h => h.id === id)).length;
+  return S.habits.length ? faits / S.habits.length : 0;
+}
+function jourReussi(k){
+  return S.mode === "hard" ? tauxJour(k) === 1 : tauxJour(k) >= SEUIL_REUSSITE_NORMAL;
+}
+function calculer(){
+  const today = aujourdHui();
+  let xp = 0, penalites = 0;
+  const attrs = {force:0, esprit:0, discipline:0, serenite:0};
+  for (const [k, ids] of Object.entries(S.log)){
+    let n = 0;
+    for (const id of ids){
+      const h = S.habits.find(x => x.id === id);
+      if (!h) continue;
+      n++; xp += XP_QUETE; attrs[h.attr] += 1;
+    }
+    if (S.habits.length && n === S.habits.length) xp += XP_BONUS_JOUR;
+  }
+  for (const c of Object.values(S.focus)){ xp += c * XP_FOCUS; attrs.discipline += c; }
+  // Mode difficile : chaque journée passée ratée coûte des XP
+  if (S.mode === "hard"){
+    for (let k = S.debut; k < today; k = ajouterJours(k, 1)) if (!jourReussi(k)) penalites++;
+    xp -= penalites * XP_PENALITE;
+  }
+  xp = Math.max(0, xp);
+  // Niveau : il faut 100 XP pour le niveau 2, puis chaque niveau coûte 50 XP de plus que le précédent
+  let niveau = 1, seuil = 100, reste = xp;
+  while (reste >= seuil){ reste -= seuil; niveau++; seuil += 50; }
+  // Série : jours réussis consécutifs (aujourd'hui compte s'il est déjà réussi)
+  let serie = 0, k = jourReussi(today) ? today : ajouterJours(today, -1);
+  while (k >= S.debut && jourReussi(k)){ serie++; k = ajouterJours(k, -1); }
+  // Meilleure série
+  let best = 0, cur = 0;
+  for (let d = S.debut; d <= today; d = ajouterJours(d, 1)){ if (jourReussi(d)){ cur++; best = Math.max(best, cur); } else if (d < today) cur = 0; }
+  const jour = Math.min(DUREE, ecartJours(S.debut, today) + 1);
+  return {xp, niveau, reste, seuil, attrs, serie, best, penalites, jour};
+}
+function rang(niveau){
+  if (niveau >= 30) return "Légende";
+  if (niveau >= 20) return "Maître";
+  if (niveau >= 12) return "Champion";
+  if (niveau >= 7)  return "Guerrier";
+  if (niveau >= 3)  return "Aventurier";
+  return "Recrue";
+}
+
+/* ---------- Interface ---------- */
+const $ = s => document.querySelector(s);
+const app = $("#app");
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let onglet = "jour";
+
+function toast(msg){ const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 1800); }
+
+function render(){
+  if (!S){ $("#nav").classList.add("hidden"); return renderAccueil(); }
+  $("#nav").classList.remove("hidden");
+  document.querySelectorAll("nav button").forEach(b => b.classList.toggle("on", b.dataset.tab === onglet));
+  ({jour:renderJour, stats:renderStats, focus:renderFocus, reglages:renderReglages})[onglet]();
+}
+
+/* --- Création du programme --- */
+let choix = new Set([0,3,5,8]);
+function renderAccueil(){
+  app.innerHTML = `
+  <div class="stack">
+    <h1>Renaissance 66 ⚔️</h1>
+    <p class="muted">Il faut en moyenne 66 jours pour qu'une habitude devienne automatique. Choisis tes quêtes quotidiennes, gagne de l'XP et monte de niveau.</p>
+    <div class="card">
+      <label for="nom">Ton pseudo</label>
+      <input id="nom" maxlength="24" placeholder="ex. Terry">
+      <label>Tes quêtes quotidiennes (3 à 6 conseillé)</label>
+      <div class="chips" id="presets">${PRESETS.map((p,i) => `<button class="chip ${choix.has(i)?"on":""}" data-i="${i}">${p.ic} ${esc(p.nom)}</button>`).join("")}</div>
+      <label for="mode">Difficulté</label>
+      <select id="mode">
+        <option value="normal">Normal : journée réussie à 80 %, pas de pénalité</option>
+        <option value="hard">Difficile : 100 % obligatoire, −50 XP par jour raté</option>
+      </select>
+    </div>
+    <button class="btn" id="go">Commencer le jour 1</button>
+    <p class="muted">Tu pourras ajouter tes propres quêtes ensuite. Tes données restent sur ton téléphone.</p>
+  </div>`;
+  $("#presets").onclick = e => {
+    const b = e.target.closest(".chip"); if (!b) return;
+    const i = +b.dataset.i; choix.has(i) ? choix.delete(i) : choix.add(i); b.classList.toggle("on");
+  };
+  $("#go").onclick = () => {
+    if (!choix.size) return toast("Choisis au moins une quête");
+    S = {
+      v:1, nom: $("#nom").value.trim() || "Héros", mode: $("#mode").value, debut: aujourdHui(),
+      habits: [...choix].map((i,n) => ({id:"h"+Date.now().toString(36)+n, ...PRESETS[i]})),
+      log:{}, focus:{}
+    };
+    sauver(); onglet = "jour"; render();
+  };
+}
+
+/* --- Quêtes du jour --- */
+function renderJour(){
+  const c = calculer(), today = aujourdHui(), faits = S.log[today] || [];
+  const fini = c.jour >= DUREE && ecartJours(S.debut, today) + 1 > DUREE;
+  app.innerHTML = `
+  <div class="row between" style="margin-bottom:14px">
+    <div><h1>Salut ${esc(S.nom)}</h1><div class="muted">Jour ${c.jour} / ${DUREE} · ${S.mode === "hard" ? "🔥 Difficile" : "Normal"}</div></div>
+    <div style="text-align:right"><div class="lvl">Nv ${c.niveau}</div><div class="muted">${rang(c.niveau)}</div></div>
+  </div>
+  <div class="card">
+    <div class="row between muted" style="margin-bottom:6px"><span>${c.reste} / ${c.seuil} XP</span><span>🔥 Série : ${c.serie} j</span></div>
+    <div class="bar"><i style="width:${Math.round(c.reste / c.seuil * 100)}%"></i></div>
+  </div>
+  ${fini ? `<div class="card"><h2>🏆 Programme de 66 jours terminé !</h2><p class="muted">Tu peux continuer sur ta lancée ou relancer un nouveau programme dans les réglages.</p></div>` : ""}
+  <div class="card">
+    <div class="row between"><h2>Quêtes du jour</h2><span class="muted">${faits.filter(id => S.habits.some(h => h.id === id)).length}/${S.habits.length}</span></div>
+    <div id="quetes">${S.habits.map(h => `
+      <button class="quest ${faits.includes(h.id) ? "done" : ""}" data-id="${h.id}">
+        <span class="ic">${esc(h.ic)}</span>
+        <span><span class="t">${esc(h.nom)}</span><br><span class="muted">+${XP_QUETE} XP · ${ATTRS[h.attr].ic} ${ATTRS[h.attr].nom}</span></span>
+        <span class="chk">${faits.includes(h.id) ? "✓" : ""}</span>
+      </button>`).join("")}</div>
+    <p class="muted" style="margin-top:6px">Toutes les quêtes faites = +${XP_BONUS_JOUR} XP bonus.</p>
+  </div>`;
+  $("#quetes").onclick = e => {
+    const b = e.target.closest(".quest"); if (!b) return;
+    const avant = calculer().niveau;
+    const l = S.log[today] = S.log[today] || [];
+    const i = l.indexOf(b.dataset.id);
+    i >= 0 ? l.splice(i,1) : l.push(b.dataset.id);
+    if (!l.length) delete S.log[today];
+    sauver();
+    const apres = calculer();
+    if (apres.niveau > avant) toast(`⬆️ Niveau ${apres.niveau} !`);
+    else if (i < 0 && tauxJour(today) === 1) toast("🎉 Journée parfaite !");
+    else if (i < 0) toast(`+${XP_QUETE} XP`);
+    render();
+  };
+}
+
+/* --- Progrès --- */
+function renderStats(){
+  const c = calculer(), today = aujourdHui();
+  const cases = [];
+  for (let n = 0; n < DUREE; n++){
+    const k = ajouterJours(S.debut, n);
+    let cl = "";
+    if (k <= today){ const t = tauxJour(k); cl = jourReussi(k) ? "ok" : t > 0 ? "part" : (k < today ? "ko" : ""); }
+    if (k === today) cl += " today";
+    cases.push(`<span class="${cl}" title="Jour ${n+1} · ${k}"></span>`);
+  }
+  app.innerHTML = `
+  <h1 style="margin-bottom:14px">Progrès</h1>
+  <div class="card">
+    <div class="row between"><div><div class="muted">XP total</div><b style="font-size:1.6rem">${c.xp}</b></div>
+    <div><div class="muted">Niveau</div><b style="font-size:1.6rem">${c.niveau}</b></div>
+    <div><div class="muted">Meilleure série</div><b style="font-size:1.6rem">${c.best} j</b></div></div>
+    ${S.mode === "hard" ? `<p class="muted" style="margin-top:10px">Pénalités subies : ${c.penalites} (−${c.penalites * XP_PENALITE} XP)</p>` : ""}
+  </div>
+  <div class="card">
+    <h2>Attributs</h2>
+    <div class="attrs">${Object.entries(ATTRS).map(([k,a]) => `<div class="attr"><div class="muted">${a.ic} ${a.nom}</div><b>${c.attrs[k]}</b></div>`).join("")}</div>
+  </div>
+  <div class="card">
+    <h2>Les 66 jours</h2>
+    <div class="grid66">${cases.join("")}</div>
+    <p class="muted" style="margin-top:10px">${["ok:réussi","part:partiel","ko:raté"].map(x => { const [c,t] = x.split(":"); return `<span class="grid66" style="display:inline-grid;grid-template-columns:12px;vertical-align:middle;margin-right:4px"><span class="${c}"></span></span>${t}`; }).join(" &nbsp; ")}</p>
+  </div>`;
+}
+
+/* --- Focus (minuteur) --- */
+let minuteur = {fin:0, h:null, duree:25};
+function renderFocus(){
+  const n = S.focus[aujourdHui()] || 0;
+  const enCours = minuteur.fin > Date.now();
+  app.innerHTML = `
+  <h1 style="margin-bottom:14px">Session focus</h1>
+  <div class="card">
+    <p class="muted">Pose ton téléphone, concentre-toi. Session terminée = +${XP_FOCUS} XP et +1 Discipline.</p>
+    <div class="timer" id="tm">${fmt(enCours ? minuteur.fin - Date.now() : minuteur.duree * 60000)}</div>
+    <div class="chips" style="justify-content:center;margin-bottom:14px">${[15,25,45,60].map(m => `<button class="chip ${m === minuteur.duree ? "on" : ""}" data-m="${m}" ${enCours ? "disabled" : ""}>${m} min</button>`).join("")}</div>
+    <button class="btn ${enCours ? "ghost" : ""}" id="tgo">${enCours ? "Abandonner" : "Démarrer"}</button>
+  </div>
+  <div class="card"><div class="row between"><span>Sessions aujourd'hui</span><b>${n}</b></div></div>`;
+  app.querySelector(".chips").onclick = e => { const b = e.target.closest("[data-m]"); if (!b || enCours) return; minuteur.duree = +b.dataset.m; render(); };
+  $("#tgo").onclick = () => {
+    if (minuteur.fin > Date.now()){ minuteur.fin = 0; clearInterval(minuteur.h); toast("Session abandonnée"); }
+    else { minuteur.fin = Date.now() + minuteur.duree * 60000; tick(); minuteur.h = setInterval(tick, 500); }
+    render();
+  };
+}
+function fmt(ms){ const s = Math.max(0, Math.ceil(ms / 1000)); return `${pad(Math.floor(s/60))}:${pad(s%60)}`; }
+function tick(){
+  if (!minuteur.fin) return;
+  const r = minuteur.fin - Date.now();
+  const el = $("#tm"); if (el && onglet === "focus") el.textContent = fmt(r);
+  if (r <= 0){
+    clearInterval(minuteur.h); minuteur.fin = 0;
+    const k = aujourdHui(); S.focus[k] = (S.focus[k] || 0) + 1; sauver();
+    try { navigator.vibrate && navigator.vibrate([200,100,200]); } catch(e){}
+    toast(`✅ Session terminée : +${XP_FOCUS} XP`);
+    render();
+  }
+}
+
+/* --- Réglages --- */
+function renderReglages(){
+  app.innerHTML = `
+  <h1 style="margin-bottom:14px">Réglages</h1>
+  <div class="card">
+    <h2>Mes quêtes</h2>
+    <div id="liste">${S.habits.map(h => `<div class="row between" style="padding:6px 0"><span>${esc(h.ic)} ${esc(h.nom)} <span class="muted">· ${ATTRS[h.attr].nom}</span></span><button class="del" data-id="${h.id}" aria-label="Supprimer">✕</button></div>`).join("")}</div>
+    <label for="nq">Nouvelle quête</label>
+    <div class="row"><input id="nqi" style="width:64px;text-align:center" maxlength="2" value="⭐" aria-label="Emoji"><input id="nq" placeholder="ex. Pas de réseaux avant midi" maxlength="40"></div>
+    <label for="na">Attribut gagné</label>
+    <select id="na">${Object.entries(ATTRS).map(([k,a]) => `<option value="${k}">${a.ic} ${a.nom}</option>`).join("")}</select>
+    <button class="btn ghost" id="add" style="margin-top:12px">Ajouter</button>
+    <p class="muted" style="margin-top:8px">Supprimer une quête retire aussi l'XP qu'elle t'avait rapportée.</p>
+  </div>
+  <div class="card stack">
+    <h2>Sauvegarde</h2>
+    <p class="muted">Les données sont stockées uniquement sur cet appareil. Exporte-les de temps en temps pour ne rien perdre.</p>
+    <button class="btn ghost" id="exp">Exporter (fichier .json)</button>
+    <button class="btn ghost" id="imp">Importer une sauvegarde</button>
+    <input type="file" id="fic" accept="application/json,.json" class="hidden">
+  </div>
+  <div class="card stack">
+    <h2>Recommencer</h2>
+    <button class="btn danger" id="reset">Effacer tout et relancer un programme</button>
+  </div>`;
+  $("#liste").onclick = e => {
+    const b = e.target.closest(".del"); if (!b) return;
+    if (S.habits.length === 1) return toast("Garde au moins une quête");
+    if (!confirm("Supprimer cette quête ?")) return;
+    S.habits = S.habits.filter(h => h.id !== b.dataset.id); sauver(); render();
+  };
+  $("#add").onclick = () => {
+    const nom = $("#nq").value.trim(); if (!nom) return toast("Donne un nom à la quête");
+    S.habits.push({id:"h"+Date.now().toString(36), ic: $("#nqi").value.trim() || "⭐", nom, attr: $("#na").value});
+    sauver(); toast("Quête ajoutée"); render();
+  };
+  $("#exp").onclick = () => {
+    const url = URL.createObjectURL(new Blob([JSON.stringify(S, null, 2)], {type:"application/json"}));
+    const a = Object.assign(document.createElement("a"), {href:url, download:`renaissance66-${aujourdHui()}.json`});
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+  $("#imp").onclick = () => $("#fic").click();
+  $("#fic").onchange = async e => {
+    const f = e.target.files[0]; if (!f) return;
+    try {
+      const d = JSON.parse(await f.text());
+      if (!d || !Array.isArray(d.habits) || typeof d.log !== "object" || !d.debut) throw 0;
+      d.focus = d.focus || {};
+      S = d; sauver(); toast("Sauvegarde importée"); onglet = "jour"; render();
+    } catch(err){ toast("Fichier invalide"); }
+  };
+  $("#reset").onclick = () => {
+    if (!confirm("Tout effacer ? Exporte d'abord si tu veux garder ton historique.")) return;
+    try { localStorage.removeItem(CLE); } catch(e){}
+    S = null; render();
+  };
+}
+
+/* ---------- Démarrage ---------- */
+$("#nav").onclick = e => { const b = e.target.closest("button"); if (!b) return; onglet = b.dataset.tab; render(); window.scrollTo(0,0); };
+document.addEventListener("visibilitychange", () => { if (!document.hidden){ tick(); if (S) render(); } });
+render();
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("sw.js").catch(() => {});
+</script>
+</body>
+</html>
