@@ -1,0 +1,471 @@
+<title>Renaissance 66</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#0f1115">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Figtree:wght@400;600;700&display=swap">
+<style>
+/* Layout : une colonne façon appli mobile, barre d'onglets fixée en bas. Look sombre assumé (jeu de rôle), un seul thème. */
+:root{
+  color-scheme: dark;
+  --bg:#0f1115; --card:#171a21; --card2:#1f232c; --line:#2a2f3a;
+  --text:#eef0f4; --muted:#949aa8; --accent:#f2a93b; --accent2:#ffd27a; --on-accent:#1a1300;
+  --ok:#3ecf8e; --ok-dim:#2a5f48; --on-ok:#06210f; --bad:#ff6b6b;
+  --display:"Chakra Petch", "Trebuchet MS", system-ui, sans-serif;
+  --body:"Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --radius:16px;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--text)}
+body{font:16px/1.45 var(--body);margin:0 auto;max-width:560px;
+  padding-block:16px 96px;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));
+  padding-right:max(16px, env(safe-area-inset-right, 0px));
+  -webkit-tap-highlight-color:transparent}
+h1,h2,p{margin:0}
+h1{font:700 1.55rem/1.15 var(--display);letter-spacing:.01em;text-wrap:balance}
+h2{font:600 1.05rem/1.2 var(--display);letter-spacing:.02em}
+.muted{color:var(--muted);font-size:.9rem}
+.screen{display:flex;flex-direction:column;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;gap:10px}
+.row{display:flex;align-items:center;gap:12px}
+.between{justify-content:space-between}
+button{font:inherit;color:inherit;border:0;cursor:pointer;background:none}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn{background:var(--accent);color:var(--on-accent);font-weight:700;padding:12px 18px;border-radius:12px;width:100%}
+.btn.ghost{background:var(--card2);color:var(--text);font-weight:600}
+.btn.danger{background:transparent;border:1px solid var(--bad);color:var(--bad)}
+.btn.danger.arme{background:var(--bad);color:var(--bg)}
+input,select,textarea{font:inherit;color:var(--text);background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:11px 12px;width:100%}
+textarea{min-height:90px;font-size:.8rem;font-family:ui-monospace,Menlo,monospace}
+label{display:block;font-size:.9rem;color:var(--muted)}
+.field{display:flex;flex-direction:column;gap:6px}
+.bar{height:10px;background:var(--card2);border-radius:99px;overflow:hidden}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:99px;transition:width .4s}
+.lvl{font:700 2.2rem/1 var(--display);color:var(--accent);font-variant-numeric:tabular-nums}
+.rang{font:600 .75rem/1 var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--accent2);margin-top:4px}
+.quests{display:flex;flex-direction:column;gap:8px}
+.quest{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:var(--card2);width:100%;text-align:left}
+.quest .ic{font-size:1.4rem;width:32px;text-align:center;flex:none}
+.quest .txt{min-width:0}
+.quest .chk{margin-left:auto;width:26px;height:26px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;flex:none;font-weight:700}
+.quest.done{opacity:.6}.quest.done .t{text-decoration:line-through}
+.quest.done .chk{background:var(--ok);border-color:var(--ok);color:var(--on-ok)}
+.stats3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stats3 b,.attr b{display:block;font:700 1.5rem/1.2 var(--display);font-variant-numeric:tabular-nums}
+.attrs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.attr{background:var(--card2);border-radius:12px;padding:10px 12px}
+.grid66{display:grid;grid-template-columns:repeat(11,1fr);gap:5px}
+.grid66 span,.leg i{aspect-ratio:1;border-radius:5px;background:var(--card2);max-width:100%}
+.ok{background:var(--ok)!important}.part{background:var(--ok-dim)!important}.ko{background:var(--bad)!important}
+.grid66 .today{outline:2px solid var(--accent);outline-offset:1px}
+.leg{display:flex;gap:14px;flex-wrap:wrap}
+.leg span{display:flex;align-items:center;gap:6px}
+.leg i{display:inline-block;width:12px}
+nav{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--bg);border-top:1px solid var(--line);display:flex;justify-content:center;
+  padding-bottom:env(safe-area-inset-bottom, 0px);
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+nav button{flex:1;max-width:140px;padding:10px 0 12px;font-size:.75rem;font-weight:600;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:4px}
+nav svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav button.on{color:var(--accent)}
+.timer{font:700 4rem/1 var(--display);text-align:center;font-variant-numeric:tabular-nums;margin:10px 0}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:8px 12px;border-radius:99px;background:var(--card2);border:1px solid var(--line);font-size:.9rem}
+.chip.on{border-color:var(--accent);color:var(--accent2)}
+.chip:disabled{opacity:.5}
+.toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top, 0px) + 16px);transform:translateX(-50%);background:var(--accent);color:var(--on-accent);font-weight:700;padding:10px 16px;border-radius:12px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9;max-width:calc(100% - 32px)}
+.toast.show{opacity:1}
+.del{color:var(--bad);font-size:.85rem;font-weight:600;padding:6px 10px;border-radius:8px;flex:none}
+.del.arme{background:var(--bad);color:var(--bg)}
+.sync{display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--muted)}
+.sync i{width:8px;height:8px;border-radius:50%;background:var(--muted);flex:none}
+.sync.on i{background:var(--ok)}.sync.off i{background:var(--bad)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<main id="app"></main>
+<nav id="nav" hidden>
+  <button data-tab="jour" class="on"><svg viewBox="0 0 24 24"><path d="M14.5 17.5 3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2"/></svg>Quêtes</button>
+  <button data-tab="stats"><svg viewBox="0 0 24 24"><path d="M3 3v18h18M7 15l4-4 3 3 6-6"/></svg>Progrès</button>
+  <button data-tab="focus"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6"/></svg>Focus</button>
+  <button data-tab="reglages"><svg viewBox="0 0 24 24"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>Réglages</button>
+</nav>
+
+<script>
+"use strict";
+/* ---------- Données de base ---------- */
+const DUREE = 66;
+const ATTRS = {
+  force:      {nom:"Force",      ic:"💪"},
+  esprit:     {nom:"Esprit",     ic:"🧠"},
+  discipline: {nom:"Discipline", ic:"🛡️"},
+  serenite:   {nom:"Sérénité",   ic:"🧘"}
+};
+const PRESETS = [
+  {ic:"🏃", nom:"30 min de sport",           attr:"force"},
+  {ic:"💧", nom:"Boire 2 L d'eau",            attr:"force"},
+  {ic:"🥗", nom:"Manger sain, zéro sucre",    attr:"force"},
+  {ic:"📖", nom:"Lire 10 pages",              attr:"esprit"},
+  {ic:"🎓", nom:"Apprendre 20 min",           attr:"esprit"},
+  {ic:"⏰", nom:"Lever avant 7 h",            attr:"discipline"},
+  {ic:"📵", nom:"Moins de 2 h d'écran loisir", attr:"discipline"},
+  {ic:"🛏️", nom:"Coucher avant 23 h",         attr:"discipline"},
+  {ic:"🧘", nom:"10 min de méditation",       attr:"serenite"},
+  {ic:"✍️", nom:"Écrire 3 gratitudes",        attr:"serenite"},
+  {ic:"🚶", nom:"Marcher dehors 20 min",      attr:"serenite"}
+];
+const XP_QUETE = 10, XP_BONUS_JOUR = 20, XP_FOCUS = 15, XP_PENALITE = 50;
+const SEUIL_REUSSITE_NORMAL = 0.8;
+
+/* ---------- Stockage ----------
+   Source de vérité : la base de l'artefact, dans l'espace privé du compte (data/users/<id>/etat).
+   Copie locale dans le navigateur pour un affichage instantané et en secours. */
+const CLE = "renaissance66";
+let S = lireLocal();
+let docRef = null, syncEtat = "attente", ecritureEnCours = false, ecritureAFaire = false, minuterieSync = null;
+
+function valide(v){ return v && Array.isArray(v.habits) && v.log && typeof v.log === "object" && typeof v.debut === "string"; }
+function lireLocal(){ try { const v = JSON.parse(localStorage.getItem(CLE)); if (valide(v)) return v; } catch(e){} return null; }
+function ecrireLocal(){ try { S ? localStorage.setItem(CLE, JSON.stringify(S)) : localStorage.removeItem(CLE); } catch(e){} }
+
+function sauver(){
+  ecrireLocal();
+  if (!docRef) return;
+  clearTimeout(minuterieSync);
+  minuterieSync = setTimeout(pousser, 500);
+}
+async function pousser(){
+  if (!docRef) return;
+  if (ecritureEnCours){ ecritureAFaire = true; return; }
+  ecritureEnCours = true;
+  try {
+    if (S) await docRef.set(JSON.parse(JSON.stringify(S))); else await docRef.delete();
+    majSync("on");
+  } catch(e){
+    if (e && e.code === "unavailable"){ setTimeout(pousser, 1500 + Math.random()*1500); }
+    else { majSync("off"); if (e && e.code === "invalid_argument") docRef = null; }
+  } finally {
+    ecritureEnCours = false;
+    if (ecritureAFaire){ ecritureAFaire = false; pousser(); }
+  }
+}
+function majSync(etat){ syncEtat = etat; const el = document.getElementById("sync"); if (el) el.outerHTML = htmlSync(); }
+function htmlSync(){
+  const t = {on:"Sauvegardé sur ton compte Claude", off:"Sauvegardé seulement sur cet appareil", attente:"Connexion à ta sauvegarde…"}[syncEtat];
+  return `<div id="sync" class="sync ${syncEtat}"><i></i><span>${t}</span></div>`;
+}
+
+async function brancherBase(){
+  if (!window.claude || typeof window.claude.use !== "function") return majSync("off");
+  try {
+    const [db, user] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
+    const id = user ? await user.id() : null;
+    if (!db || !id) return majSync("off");
+    const ref = db.doc("data/users/" + id + "/etat");
+    let premier = true;
+    const delai = setTimeout(() => { if (syncEtat === "attente") majSync("off"); }, 10000);
+    ref.onSnapshot(snap => {
+      if (snap.metadata.hasPendingWrites) return;
+      if (!snap.metadata.fromCache) clearTimeout(delai);
+      const distant = snap.exists ? snap.data() : null;
+      docRef = ref;
+      if (premier && !snap.metadata.fromCache){
+        premier = false;
+        if (!valide(distant)){ if (S) pousser(); else majSync("on"); return; }
+      }
+      if (valide(distant) && JSON.stringify(distant) !== JSON.stringify(S)){
+        S = JSON.parse(JSON.stringify(distant)); S.focus = S.focus || {};
+        ecrireLocal(); render();
+      }
+      if (!snap.metadata.fromCache) majSync("on");
+    }, () => { clearTimeout(delai); majSync("off"); });
+  } catch(e){ majSync("off"); }
+}
+
+/* ---------- Dates (heure locale) ---------- */
+const pad = n => String(n).padStart(2,"0");
+const cleDate = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const versDate = k => { const [y,m,d] = k.split("-").map(Number); return new Date(y, m-1, d); };
+const ajouterJours = (k, n) => { const d = versDate(k); d.setDate(d.getDate()+n); return cleDate(d); };
+const aujourdHui = () => cleDate(new Date());
+const ecartJours = (a, b) => Math.round((versDate(b) - versDate(a)) / 86400000);
+
+/* ---------- Calculs (tout est recalculé depuis l'historique) ---------- */
+function tauxJour(k){
+  const faits = (S.log[k] || []).filter(id => S.habits.some(h => h.id === id)).length;
+  return S.habits.length ? faits / S.habits.length : 0;
+}
+function jourReussi(k){ return S.mode === "hard" ? tauxJour(k) === 1 : tauxJour(k) >= SEUIL_REUSSITE_NORMAL; }
+function calculer(){
+  const today = aujourdHui();
+  let xp = 0, penalites = 0;
+  const attrs = {force:0, esprit:0, discipline:0, serenite:0};
+  for (const ids of Object.values(S.log)){
+    let n = 0;
+    for (const id of ids){
+      const h = S.habits.find(x => x.id === id);
+      if (!h) continue;
+      n++; xp += XP_QUETE; attrs[h.attr] = (attrs[h.attr] || 0) + 1;
+    }
+    if (S.habits.length && n === S.habits.length) xp += XP_BONUS_JOUR;
+  }
+  for (const c of Object.values(S.focus || {})){ xp += c * XP_FOCUS; attrs.discipline += c; }
+  if (S.mode === "hard"){
+    for (let k = S.debut; k < today; k = ajouterJours(k, 1)) if (!jourReussi(k)) penalites++;
+    xp -= penalites * XP_PENALITE;
+  }
+  xp = Math.max(0, xp);
+  let niveau = 1, seuil = 100, reste = xp;
+  while (reste >= seuil){ reste -= seuil; niveau++; seuil += 50; }
+  let serie = 0, k = jourReussi(today) ? today : ajouterJours(today, -1);
+  while (k >= S.debut && jourReussi(k)){ serie++; k = ajouterJours(k, -1); }
+  let best = 0, cur = 0;
+  for (let d = S.debut; d <= today; d = ajouterJours(d, 1)){ if (jourReussi(d)){ cur++; best = Math.max(best, cur); } else if (d < today) cur = 0; }
+  const jour = Math.min(DUREE, ecartJours(S.debut, today) + 1);
+  return {xp, niveau, reste, seuil, attrs, serie, best, penalites, jour};
+}
+function rang(n){
+  if (n >= 30) return "Légende";
+  if (n >= 20) return "Maître";
+  if (n >= 12) return "Champion";
+  if (n >= 7)  return "Guerrier";
+  if (n >= 3)  return "Aventurier";
+  return "Recrue";
+}
+
+/* ---------- Interface ---------- */
+const $ = s => document.querySelector(s);
+const app = $("#app");
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let onglet = "jour";
+
+function toast(msg){ const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 1800); }
+
+/* Confirmation en deux appuis (les boîtes de dialogue du navigateur sont bloquées ici). */
+function deuxAppuis(btn, texteConfirmation, action){
+  btn.addEventListener("click", () => {
+    if (btn.classList.contains("arme")){ action(); return; }
+    const avant = btn.textContent;
+    btn.classList.add("arme"); btn.textContent = texteConfirmation;
+    setTimeout(() => { if (btn.isConnected){ btn.classList.remove("arme"); btn.textContent = avant; } }, 3000);
+  });
+}
+
+function render(){
+  if (!S){ $("#nav").hidden = true; return renderAccueil(); }
+  $("#nav").hidden = false;
+  document.querySelectorAll("nav button").forEach(b => b.classList.toggle("on", b.dataset.tab === onglet));
+  ({jour:renderJour, stats:renderStats, focus:renderFocus, reglages:renderReglages})[onglet]();
+}
+
+/* --- Création du programme --- */
+let choix = new Set([0,3,5,8]);
+function renderAccueil(){
+  app.innerHTML = `
+  <div class="screen">
+    <h1>Renaissance 66</h1>
+    <p class="muted">Il faut en moyenne 66 jours pour qu'une habitude devienne automatique. Choisis tes quêtes quotidiennes, gagne de l'XP et monte de niveau.</p>
+    ${syncEtat === "attente" ? htmlSync() : ""}
+    <div class="card">
+      <div class="field"><label for="nom">Ton pseudo</label><input id="nom" maxlength="24" placeholder="ex. Terry"></div>
+      <div class="field"><label>Tes quêtes quotidiennes (3 à 6 conseillé)</label>
+        <div class="chips" id="presets">${PRESETS.map((p,i) => `<button class="chip ${choix.has(i)?"on":""}" data-i="${i}">${p.ic} ${esc(p.nom)}</button>`).join("")}</div></div>
+      <div class="field"><label for="mode">Difficulté</label>
+        <select id="mode">
+          <option value="normal">Normal : journée réussie à 80 %, pas de pénalité</option>
+          <option value="hard">Difficile : 100 % obligatoire, −50 XP par jour raté</option>
+        </select></div>
+    </div>
+    <button class="btn" id="go">Commencer le jour 1</button>
+    <p class="muted">Tu pourras ajouter tes propres quêtes ensuite.</p>
+  </div>`;
+  $("#presets").onclick = e => {
+    const b = e.target.closest(".chip"); if (!b) return;
+    const i = +b.dataset.i; choix.has(i) ? choix.delete(i) : choix.add(i); b.classList.toggle("on");
+  };
+  $("#go").onclick = () => {
+    if (!choix.size) return toast("Choisis au moins une quête");
+    S = {
+      v:1, nom: $("#nom").value.trim() || "Héros", mode: $("#mode").value, debut: aujourdHui(),
+      habits: [...choix].map((i,n) => ({id:"h"+Date.now().toString(36)+n, ...PRESETS[i]})),
+      log:{}, focus:{}
+    };
+    sauver(); onglet = "jour"; render();
+  };
+}
+
+/* --- Quêtes du jour --- */
+function renderJour(){
+  const c = calculer(), today = aujourdHui(), faits = S.log[today] || [];
+  const fini = ecartJours(S.debut, today) + 1 > DUREE;
+  app.innerHTML = `
+  <div class="screen">
+    <div class="row between">
+      <div><h1>Salut ${esc(S.nom)}</h1><div class="muted">Jour ${c.jour} / ${DUREE} · ${S.mode === "hard" ? "Mode difficile" : "Mode normal"}</div></div>
+      <div style="text-align:right"><div class="lvl">Nv ${c.niveau}</div><div class="rang">${rang(c.niveau)}</div></div>
+    </div>
+    <div class="card">
+      <div class="row between muted"><span>${c.reste} / ${c.seuil} XP</span><span>Série : ${c.serie} j</span></div>
+      <div class="bar"><i style="width:${Math.round(c.reste / c.seuil * 100)}%"></i></div>
+    </div>
+    ${fini ? `<div class="card"><h2>Programme de 66 jours terminé</h2><p class="muted">Continue sur ta lancée, ou relance un nouveau programme dans les réglages.</p></div>` : ""}
+    <div class="card">
+      <div class="row between"><h2>Quêtes du jour</h2><span class="muted">${faits.filter(id => S.habits.some(h => h.id === id)).length}/${S.habits.length}</span></div>
+      <div class="quests" id="quetes">${S.habits.map(h => `
+        <button class="quest ${faits.includes(h.id) ? "done" : ""}" data-id="${h.id}">
+          <span class="ic">${esc(h.ic)}</span>
+          <span class="txt"><span class="t">${esc(h.nom)}</span><br><span class="muted">+${XP_QUETE} XP · ${(ATTRS[h.attr]||ATTRS.force).nom}</span></span>
+          <span class="chk">${faits.includes(h.id) ? "✓" : ""}</span>
+        </button>`).join("")}</div>
+      <p class="muted">Toutes les quêtes faites = +${XP_BONUS_JOUR} XP bonus.</p>
+    </div>
+  </div>`;
+  $("#quetes").onclick = e => {
+    const b = e.target.closest(".quest"); if (!b) return;
+    const avant = calculer().niveau;
+    const l = S.log[today] = S.log[today] || [];
+    const i = l.indexOf(b.dataset.id);
+    i >= 0 ? l.splice(i,1) : l.push(b.dataset.id);
+    if (!l.length) delete S.log[today];
+    sauver();
+    const apres = calculer();
+    if (apres.niveau > avant) toast(`Niveau ${apres.niveau} atteint`);
+    else if (i < 0 && tauxJour(today) === 1) toast("Journée parfaite");
+    else if (i < 0) toast(`+${XP_QUETE} XP`);
+    render();
+  };
+}
+
+/* --- Progrès --- */
+function renderStats(){
+  const c = calculer(), today = aujourdHui();
+  const cases = [];
+  for (let n = 0; n < DUREE; n++){
+    const k = ajouterJours(S.debut, n);
+    let cl = "";
+    if (k <= today){ const t = tauxJour(k); cl = jourReussi(k) ? "ok" : t > 0 ? "part" : (k < today ? "ko" : ""); }
+    if (k === today) cl += " today";
+    cases.push(`<span class="${cl}" title="Jour ${n+1} · ${k}"></span>`);
+  }
+  app.innerHTML = `
+  <div class="screen">
+    <h1>Progrès</h1>
+    <div class="card">
+      <div class="stats3">
+        <div><div class="muted">XP total</div><b>${c.xp}</b></div>
+        <div><div class="muted">Niveau</div><b>${c.niveau}</b></div>
+        <div><div class="muted">Meilleure série</div><b>${c.best} j</b></div>
+      </div>
+      ${S.mode === "hard" ? `<p class="muted">Pénalités subies : ${c.penalites} (−${c.penalites * XP_PENALITE} XP)</p>` : ""}
+    </div>
+    <div class="card">
+      <h2>Attributs</h2>
+      <div class="attrs">${Object.entries(ATTRS).map(([k,a]) => `<div class="attr"><div class="muted">${a.ic} ${a.nom}</div><b>${c.attrs[k]}</b></div>`).join("")}</div>
+    </div>
+    <div class="card">
+      <h2>Les 66 jours</h2>
+      <div class="grid66">${cases.join("")}</div>
+      <div class="leg muted"><span><i class="ok"></i>réussi</span><span><i class="part"></i>partiel</span><span><i class="ko"></i>raté</span></div>
+    </div>
+  </div>`;
+}
+
+/* --- Focus (minuteur) --- */
+let minuteur = {fin:0, h:null, duree:25};
+function renderFocus(){
+  const n = (S.focus || {})[aujourdHui()] || 0;
+  const enCours = minuteur.fin > Date.now();
+  app.innerHTML = `
+  <div class="screen">
+    <h1>Session focus</h1>
+    <div class="card">
+      <p class="muted">Pose ton téléphone et concentre-toi. Session terminée = +${XP_FOCUS} XP et +1 Discipline. Garde la page ouverte.</p>
+      <div class="timer" id="tm">${fmt(enCours ? minuteur.fin - Date.now() : minuteur.duree * 60000)}</div>
+      <div class="chips" id="durees" style="justify-content:center">${[15,25,45,60].map(m => `<button class="chip ${m === minuteur.duree ? "on" : ""}" data-m="${m}" ${enCours ? "disabled" : ""}>${m} min</button>`).join("")}</div>
+      <button class="btn ${enCours ? "ghost" : ""}" id="tgo">${enCours ? "Abandonner" : "Démarrer"}</button>
+    </div>
+    <div class="card"><div class="row between"><span>Sessions aujourd'hui</span><b>${n}</b></div></div>
+  </div>`;
+  $("#durees").onclick = e => { const b = e.target.closest("[data-m]"); if (!b || enCours) return; minuteur.duree = +b.dataset.m; render(); };
+  $("#tgo").onclick = () => {
+    if (minuteur.fin > Date.now()){ minuteur.fin = 0; clearInterval(minuteur.h); toast("Session abandonnée"); }
+    else {
+      minuteur.fin = Date.now() + minuteur.duree * 60000; tick(); minuteur.h = setInterval(tick, 500);
+      try { navigator.wakeLock && navigator.wakeLock.request("screen").catch(() => {}); } catch(e){}
+    }
+    render();
+  };
+}
+function fmt(ms){ const s = Math.max(0, Math.ceil(ms / 1000)); return `${pad(Math.floor(s/60))}:${pad(s%60)}`; }
+function tick(){
+  if (!minuteur.fin) return;
+  const r = minuteur.fin - Date.now();
+  const el = $("#tm"); if (el && onglet === "focus") el.textContent = fmt(r);
+  if (r <= 0){
+    clearInterval(minuteur.h); minuteur.fin = 0;
+    const k = aujourdHui(); S.focus = S.focus || {}; S.focus[k] = (S.focus[k] || 0) + 1; sauver();
+    try { navigator.vibrate && navigator.vibrate([200,100,200]); } catch(e){}
+    toast(`Session terminée : +${XP_FOCUS} XP`);
+    render();
+  }
+}
+
+/* --- Réglages --- */
+function renderReglages(){
+  app.innerHTML = `
+  <div class="screen">
+    <h1>Réglages</h1>
+    ${htmlSync()}
+    <div class="card">
+      <h2>Mes quêtes</h2>
+      <div id="liste">${S.habits.map(h => `<div class="row between" style="padding:6px 0"><span style="min-width:0">${esc(h.ic)} ${esc(h.nom)} <span class="muted">· ${(ATTRS[h.attr]||ATTRS.force).nom}</span></span><button class="del" data-id="${h.id}">Supprimer</button></div>`).join("")}</div>
+      <div class="field"><label for="nq">Nouvelle quête</label>
+        <div class="row"><input id="nqi" style="width:64px;text-align:center;flex:none" maxlength="2" value="⭐" aria-label="Emoji"><input id="nq" placeholder="ex. Pas de réseaux avant midi" maxlength="40"></div></div>
+      <div class="field"><label for="na">Attribut gagné</label>
+        <select id="na">${Object.entries(ATTRS).map(([k,a]) => `<option value="${k}">${a.ic} ${a.nom}</option>`).join("")}</select></div>
+      <button class="btn ghost" id="add">Ajouter la quête</button>
+      <p class="muted">Supprimer une quête retire aussi l'XP qu'elle t'avait rapportée.</p>
+    </div>
+    <div class="card">
+      <h2>Copie de secours</h2>
+      <p class="muted">Copie ce texte et garde-le dans tes notes. Pour restaurer, colle-le dans le champ puis appuie sur Restaurer.</p>
+      <button class="btn ghost" id="exp">Copier ma sauvegarde</button>
+      <div class="field"><label for="imptxt">Restaurer une sauvegarde</label><textarea id="imptxt" placeholder="Colle ta sauvegarde ici"></textarea></div>
+      <button class="btn ghost" id="imp">Restaurer</button>
+    </div>
+    <div class="card">
+      <h2>Recommencer</h2>
+      <button class="btn danger" id="reset">Effacer tout et relancer un programme</button>
+    </div>
+  </div>`;
+  document.querySelectorAll("#liste .del").forEach(b => deuxAppuis(b, "Confirmer", () => {
+    if (S.habits.length === 1) return toast("Garde au moins une quête");
+    S.habits = S.habits.filter(h => h.id !== b.dataset.id); sauver(); render();
+  }));
+  $("#add").onclick = () => {
+    const nom = $("#nq").value.trim(); if (!nom) return toast("Donne un nom à la quête");
+    S.habits.push({id:"h"+Date.now().toString(36), ic: $("#nqi").value.trim() || "⭐", nom, attr: $("#na").value});
+    sauver(); toast("Quête ajoutée"); render();
+  };
+  $("#exp").onclick = () => {
+    const txt = JSON.stringify(S);
+    const repli = () => { const t = $("#imptxt"); t.value = txt; t.focus(); t.select(); toast("Sélectionné : copie-le manuellement"); };
+    try { navigator.clipboard.writeText(txt).then(() => toast("Sauvegarde copiée"), repli); } catch(e){ repli(); }
+  };
+  $("#imp").onclick = () => {
+    try {
+      const d = JSON.parse($("#imptxt").value);
+      if (!valide(d)) throw 0;
+      d.focus = d.focus || {};
+      S = d; sauver(); toast("Sauvegarde restaurée"); onglet = "jour"; render();
+    } catch(err){ toast("Ce texte n'est pas une sauvegarde valide"); }
+  };
+  deuxAppuis($("#reset"), "Appuie encore pour tout effacer", () => { S = null; sauver(); render(); });
+}
+
+/* ---------- Démarrage ---------- */
+$("#nav").onclick = e => { const b = e.target.closest("button"); if (!b) return; onglet = b.dataset.tab; render(); window.scrollTo(0,0); };
+document.addEventListener("visibilitychange", () => { if (!document.hidden){ tick(); if (S) render(); } });
+render();
+brancherBase();
+</script>
